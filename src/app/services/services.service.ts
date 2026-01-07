@@ -38,26 +38,22 @@ export class ServicesService {
   }
 
   async login(email: string, password: string): Promise<boolean> {
-    if (!email || password.length < 6) return false;
+    if (password !== '1234') return false;
 
-    try {
-      const users = await firstValueFrom(
-        this.http.get<User[]>(`${this.API_URL}/users`)
-      );
+    const users: User[] = [
+      { id: 1, name: 'cliente', email: 'cliente@demo.com', role: 'Socio' },
+      { id: 2, name: 'admin', email: 'admin@demo.com', role: 'Administrador' },
+      { id: 3, name: 'superadmin', email: 'superadmin@demo.com', role: 'SuperAdministrador' }
+    ];
 
-      const user = users.find(u => u.email === email);
-      if (user) {
-        this._currentUser.set(user);
-        this._isAuthenticated.set(true);
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        this._pageTitle.set(`Bienvenido, ${user.name}`);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Login error:', error);
-      return false;
-    }
+    const user = users.find(u => u.email === email);
+    if (!user) return false;
+
+    this._currentUser.set(user);
+    this._isAuthenticated.set(true);
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    this._pageTitle.set(`Bienvenido, ${user.name}`);
+    return true;
   }
 
   logout(): void {
