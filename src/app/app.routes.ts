@@ -33,6 +33,12 @@ export const routes: Routes = [
         canActivate: [redirectIfLoggedIn]
     },
     {
+        path: 'forgot-password',
+        loadComponent: () => import('./pages/forgot-password/forgot-password')
+        .then(m => m.ForgotPassword),
+        canActivate: [redirectIfLoggedIn]
+    },
+    {
         path: '',
         canActivate: [authGuard],
         loadComponent: () => import('./shared/components/layout/layout.component'),
