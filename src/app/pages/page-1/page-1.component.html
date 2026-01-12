@@ -1,1 +1,13 @@
-<p>page-1 works!</p>
+<h2>Clases</h2>
+@if (loading()) {
+<p>Cargando...</p>
+} @else {
+<ul>
+    @for (clase of gymClasses(); track clase.id) {
+    <li>{{ clase.nombre }} - {{ clase.hora }}</li>
+    }
+</ul>
+}
+@if (error()) {
+<p class="text-red-500">Error: {{ error() }}</p>
+}

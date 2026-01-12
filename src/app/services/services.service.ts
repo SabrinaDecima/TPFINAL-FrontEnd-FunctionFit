@@ -1,14 +1,14 @@
-// src/app/services/services.service.ts
 import { inject, Injectable, signal } from '@angular/core';
 import { User } from '../shared/interfaces/user.interface';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { GymClass } from '../shared/interfaces/gym-class.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ServicesService {
-  private API_URL = 'https://jsonplaceholder.typicode.com';
+  private API_URL = 'https://localhost:7150';
   private http = inject(HttpClient);
 
   _currentUser = signal<User | null>(null);
@@ -17,14 +17,20 @@ export class ServicesService {
 
   constructor() {
     const saved = localStorage.getItem('currentUser');
-    if (saved) {
+    const token = localStorage.getItem('authToken');
+    if (saved && token) {
       try {
         const user = JSON.parse(saved);
-        this._currentUser.set(user);
-        this._isAuthenticated.set(true);
-        this._pageTitle.set(`Bienvenido, ${user.name}`);
+        if (['Socio', 'Administrador', 'SuperAdministrador'].includes(user.role)) {
+          this._currentUser.set(user);
+          this._isAuthenticated.set(true);
+          this._pageTitle.set(`Bienvenido, ${user.name}`);
+        } else {
+          this.logout();
+        }
       } catch (e) {
         console.warn('Invalid user in localStorage');
+        this.logout();
       }
     }
   }
@@ -38,22 +44,39 @@ export class ServicesService {
   }
 
   async login(email: string, password: string): Promise<boolean> {
-    if (password !== '1234') return false;
+    const url = `${this.API_URL}/api/Auth/login`;
+    const body = { email, password };
 
-    const users: User[] = [
-      { id: 1, name: 'cliente', email: 'cliente@demo.com', role: 'Socio' },
-      { id: 2, name: 'admin', email: 'admin@demo.com', role: 'Administrador' },
-      { id: 3, name: 'superadmin', email: 'superadmin@demo.com', role: 'SuperAdministrador' }
-    ];
+    try {
+      const res = await firstValueFrom(
+        this.http.post<{
+          token: string;
+          email: string;
+          role: 'Socio' | 'Administrador' | 'SuperAdministrador';
+          userId: number;
+          name: string;
+        }>(url, body)
+      );
 
-    const user = users.find(u => u.email === email);
-    if (!user) return false;
+      const user: User = {
+        id: res.userId.toString(),
+        name: res.name,
+        email: res.email,
+        role: res.role
+      };
 
-    this._currentUser.set(user);
-    this._isAuthenticated.set(true);
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    this._pageTitle.set(`Bienvenido, ${user.name}`);
-    return true;
+      localStorage.setItem('authToken', res.token);
+      localStorage.setItem('currentUser', JSON.stringify(user));
+
+      this._currentUser.set(user);
+      this._isAuthenticated.set(true);
+      this._pageTitle.set(`Bienvenido, ${user.name}`);
+
+      return true;
+    } catch (error) {
+      console.error('Login failed:', error);
+      return false;
+    }
   }
 
   logout(): void {
@@ -61,5 +84,23 @@ export class ServicesService {
     this._isAuthenticated.set(false);
     this._pageTitle.set('Angular 20');
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
+  }
+
+  getAuthToken(): string | null {
+    return localStorage.getItem('authToken');
+  }
+
+  async getGymClasses(): Promise<GymClass[]> {
+    const token = this.getAuthToken();
+    if (!token) throw new Error('No auth token');
+
+    const url = `${this.API_URL}/api/GymClass`;
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+
+    const response = await firstValueFrom(
+      this.http.get<GymClass[]>(url, { headers })
+    );
+    return response;
   }
 }
