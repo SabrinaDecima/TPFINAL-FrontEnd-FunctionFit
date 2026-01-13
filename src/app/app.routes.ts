@@ -29,34 +29,33 @@ const redirectIfLoggedIn = () => {
 export const routes: Routes = [
     {
         path: 'login',
-        loadComponent: () => import('./pages/login/login.component'),
+        loadComponent: () => import('./pages/login/login'),
         canActivate: [redirectIfLoggedIn]
     },
     {
         path: 'forgot-password',
-        loadComponent: () => import('./pages/forgot-password/forgot-password')
-        .then(m => m.ForgotPassword),
+        loadComponent: () => import('./pages/forgot-password/forgot-password'),
         canActivate: [redirectIfLoggedIn]
     },
     {
         path: '',
         canActivate: [authGuard],
-        loadComponent: () => import('./shared/components/layout/layout.component'),
+        loadComponent: () => import('./shared/components/layout/layout'),
         children: [
-            { path: '', loadComponent: () => import('./pages/home/home.component') },
+            { path: '', loadComponent: () => import('./pages/home/home') },
             {
-                path: 'page-1',
-                loadComponent: () => import('./pages/page-1/page-1.component'),
+                path: 'clases',
+                loadComponent: () => import('./pages/clases/clases'),
                 canActivate: [roleGuard('Socio')]
             },
             {
                 path: 'page-2',
-                loadComponent: () => import('./pages/page-2/page-2.component'),
+                loadComponent: () => import('./pages/page-2/page-2'),
                 canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
             },
             {
                 path: 'page-3',
-                loadComponent: () => import('./pages/page-3/page-3.component'),
+                loadComponent: () => import('./pages/page-3/page-3'),
                 canActivate: [roleGuard('SuperAdministrador')]
             },
             { path: 'home', redirectTo: '', pathMatch: 'full' }
@@ -64,7 +63,7 @@ export const routes: Routes = [
     },
     {
         path: 'register',
-        loadComponent: () => import('./pages/register/register.component'),
+        loadComponent: () => import('./pages/register/register'),
         canActivate: [redirectIfLoggedIn]
     },
     { path: '**', redirectTo: '' }

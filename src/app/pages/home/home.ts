@@ -4,10 +4,10 @@ import { ServicesService } from '../../services/services.service';
 @Component({
   selector: 'app-home',
   imports: [],
-  templateUrl: './home.component.html',
+  templateUrl: './home.html',
   styles: ``
 })
-export default class HomeComponent {
+export default class Home {
 
   private servicesService = inject(ServicesService);
 

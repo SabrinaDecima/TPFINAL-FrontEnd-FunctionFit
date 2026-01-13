@@ -10,11 +10,11 @@ import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-forgot-password',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
-  templateUrl: './forgot-password.html'
+  templateUrl: './forgot-password.html',
+  styles: ``
 })
-export class ForgotPassword {
+export default class ForgotPassword {
 
   loading = false;
   success = false;
@@ -26,7 +26,7 @@ export class ForgotPassword {
     ])
   });
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   submit() {
     if (this.form.invalid) return;

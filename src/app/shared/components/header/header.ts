@@ -6,10 +6,10 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-header',
   imports: [CommonModule],
-  templateUrl: './header.component.html',
+  templateUrl: './header.html',
   styles: ``
 })
-export class HeaderComponent {
+export class Header {
   private servicesService = inject(ServicesService);
   private router = inject(Router);
 

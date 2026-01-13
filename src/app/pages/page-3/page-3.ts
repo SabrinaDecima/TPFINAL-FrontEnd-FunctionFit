@@ -3,9 +3,9 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-page-3',
   imports: [],
-  templateUrl: './page-3.component.html',
+  templateUrl: './page-3.html',
   styles: ``
 })
-export default class Page3Component {
+export default class Page3 {
 
 }

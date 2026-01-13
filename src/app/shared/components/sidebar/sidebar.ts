@@ -5,10 +5,10 @@ import { ServicesService } from '../../../services/services.service';
 @Component({
   selector: 'app-sidebar',
   imports: [RouterLink, RouterLinkActive],
-  templateUrl: './sidebar.component.html',
+  templateUrl: './sidebar.html',
   styles: ``
 })
-export class SidebarComponent {
+export class Sidebar {
   name = input<string>('');
   private svc = inject(ServicesService);
 
@@ -21,7 +21,7 @@ export class SidebarComponent {
     const items: { label: string; route: string }[] = [];
 
     if (user.role === 'Socio') {
-      items.push({ label: 'Page-1', route: '/page-1' });
+      items.push({ label: 'Clases', route: '/clases' });
     }
 
     if (user.role === 'Administrador' || user.role === 'SuperAdministrador') {

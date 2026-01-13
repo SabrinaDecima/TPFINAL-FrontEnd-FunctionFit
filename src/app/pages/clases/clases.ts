@@ -4,12 +4,12 @@ import { GymClass } from '../../shared/interfaces/gym-class.interface';
 
 
 @Component({
-  selector: 'app-page-1',
+  selector: 'app-clases',
   imports: [],
-  templateUrl: './page-1.component.html',
+  templateUrl: './clases.html',
   styles: ``
 })
-export default class Page1Component {
+export default class Clases {
   private svc = inject(ServicesService);
 
   gymClasses = signal<GymClass[]>([]);

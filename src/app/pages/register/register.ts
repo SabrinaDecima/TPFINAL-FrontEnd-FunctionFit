@@ -8,7 +8,7 @@ import { Router, RouterLink } from '@angular/router';
 @Component({
   selector: 'app-register',
   imports: [ReactiveFormsModule, CommonModule, RouterLink],
-  templateUrl: './register.component.html',
+  templateUrl: './register.html',
   styles: ``,
 })
 export default class Register {

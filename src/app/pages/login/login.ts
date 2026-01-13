@@ -7,10 +7,10 @@ import { ServicesService } from '../../services/services.service';
 @Component({
   selector: 'app-login',
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './login.component.html',
+  templateUrl: './login.html',
   styles: ``
 })
-export default class LoginComponent {
+export default class Login {
   private servicesService = inject(ServicesService);
   private router = inject(Router);
   private location = inject(Location);
