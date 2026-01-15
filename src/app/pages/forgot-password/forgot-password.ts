@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -6,6 +6,7 @@ import {
   FormControl,
   Validators
 } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
@@ -16,8 +17,13 @@ import { Router, RouterModule } from '@angular/router';
 })
 export default class ForgotPassword {
 
-  loading = false;
-  success = false;
+  
+  loading = signal(false);
+  success = signal(false);
+  message = signal('');
+  errorMessage = signal('');
+  authService = inject(AuthService);
+  private router = inject(Router);
 
   form = new FormGroup({
     email: new FormControl('', [
@@ -26,18 +32,24 @@ export default class ForgotPassword {
     ])
   });
 
-  constructor(private router: Router) { }
-
-  submit() {
+  async onSubmit() {
     if (this.form.invalid) return;
 
-    this.loading = true;
+    this.loading.set(true);
+    this.message.set('');
+    this.errorMessage.set('');
 
-    // Simulacion backend
-    setTimeout(() => {
-      this.loading = false;
-      this.success = true;
-    }, 1500);
+    try {
+      const email = this.form.value.email;
+      if (!email) return;
+      
+      await this.authService.forgotPassword(email);
+      this.message.set('Si el correo existe en nuestro sistema, recibirás un email con instrucciones para restablecer tu contraseña.');
+    } catch (error) {
+      this.errorMessage.set('Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente más tarde.');
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   goLogin() {

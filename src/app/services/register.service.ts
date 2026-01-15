@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
@@ -28,7 +29,7 @@ export interface RegisterResponse {
   providedIn: 'root'
 })
 export class RegisterService {
-  private API_URL = 'https://localhost:7150/api/Auth'; 
+  private API_URL = environment.apiUrl + '/Auth';
   private http = inject(HttpClient);
 
   async register(data: RegisterRequest): Promise<RegisterResponse> {
