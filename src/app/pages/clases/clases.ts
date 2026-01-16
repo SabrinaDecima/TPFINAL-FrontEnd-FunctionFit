@@ -1,36 +1,61 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ServicesService } from '../../services/services.service';
 import { GymClass } from '../../shared/interfaces/gym-class.interface';
-
+import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-clases',
-  imports: [],
+  selector: 'app-gym-classes',
   templateUrl: './clases.html',
-  styles: ``
+  standalone: true, 
+  imports: [CommonModule]
 })
-export default class Clases {
-  private svc = inject(ServicesService);
+export class GymClassesComponent implements OnInit {
 
-  gymClasses = signal<GymClass[]>([]);
-  loading = signal(false);
-  error = signal<string | null>(null);
+  gymClasses: GymClass[] = [];
+  loading = false;
+  error: string | null = null;
 
-  constructor() {
+  constructor(private servicesService: ServicesService) {}
+  
+
+  ngOnInit(): void {
     this.loadClasses();
   }
 
   async loadClasses() {
-    this.loading.set(true);
-    this.error.set(null);
+    this.loading = true;
+    this.error = null;
+
     try {
-      const classes = await this.svc.getGymClasses();
-      this.gymClasses.set(classes);
+      this.gymClasses = await this.servicesService.getGymClasses();
     } catch (err) {
-      console.error('Error fetching classes:', err);
-      this.error.set('No se pudieron cargar las clases');
+      console.error(err);
+      this.error = 'No se pudieron cargar las clases';
     } finally {
-      this.loading.set(false);
+      this.loading = false;
     }
+  }
+
+  async reserve(classId: number) {
+    try {
+      await this.servicesService.reserveClass(classId);
+      await this.loadClasses(); 
+    } catch (err: any) {
+      alert(err?.error ?? 'Error al reservar');
+    }
+  }
+
+  async cancel(classId: number) {
+    try {
+      await this.servicesService.cancelReservation(classId);
+      await this.loadClasses();
+    } catch (err: any) {
+      alert(err?.error ?? 'Error al cancelar');
+    }
+  }
+
+  getDayName(day: number): string {
+    const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    return days[day] ?? '';
   }
 }

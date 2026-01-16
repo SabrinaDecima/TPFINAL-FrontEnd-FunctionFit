@@ -50,7 +50,9 @@ export const routes: Routes = [
             { path: '', loadComponent: () => import('./pages/home/home') },
             {
                 path: 'clases',
-                loadComponent: () => import('./pages/clases/clases'),
+                loadComponent: () =>
+                import('./pages/clases/clases')
+                .then(m => m.GymClassesComponent),
                 canActivate: [roleGuard('Socio')]
             },
             {

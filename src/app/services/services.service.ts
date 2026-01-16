@@ -103,4 +103,54 @@ export class ServicesService {
     );
     return response;
   }
+
+async reserveClass(classId: number): Promise<void> {
+  const token = this.getAuthToken();
+  if (!token) throw new Error('No auth token');
+
+  const user = this._currentUser();
+  if (!user) throw new Error('No user');
+
+  const url = `${this.API_URL}/api/Enrollment/enroll`;
+
+  const headers = new HttpHeaders({
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  });
+
+  const body = {
+    userId: Number(user.id),
+    gymClassId: classId
+  };
+
+  await firstValueFrom(
+    this.http.post(url, body, { headers })
+  );
+}
+
+async cancelReservation(classId: number): Promise<void> {
+  const token = this.getAuthToken();
+  if (!token) throw new Error('No auth token');
+
+  const user = this._currentUser();
+  if (!user) throw new Error('No user');
+
+  const url = `${this.API_URL}/api/Enrollment/unenroll`;
+
+  const headers = new HttpHeaders({
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  });
+
+  const body = {
+    userId: Number(user.id),
+    gymClassId: classId
+  };
+
+  await firstValueFrom(
+    this.http.request('delete', url, { body, headers })
+  );
+}
+
+
 }
