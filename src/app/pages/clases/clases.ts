@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-gym-classes',
   templateUrl: './clases.html',
-  standalone: true, 
+  standalone: true,
   imports: [CommonModule]
 })
 export class GymClassesComponent implements OnInit {
@@ -15,8 +15,8 @@ export class GymClassesComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  constructor(private servicesService: ServicesService) {}
-  
+  constructor(private servicesService: ServicesService) { }
+
 
   ngOnInit(): void {
     this.loadClasses();
@@ -38,19 +38,33 @@ export class GymClassesComponent implements OnInit {
 
   async reserve(classId: number) {
     try {
-      await this.servicesService.reserveClass(classId);
-      await this.loadClasses(); 
+      const res = await this.servicesService.reserveClass(classId);
+      if (res.success) {
+        const item = this.gymClasses.find(c => c.id === classId);
+        if (item) item.isReservedByUser = true;
+        console.log('Reserva exitosa');
+      } else {
+        alert(res.message || 'No se pudo reservar');
+      }
     } catch (err: any) {
-      alert(err?.error ?? 'Error al reservar');
+      console.error('Error en reserva:', err);
+      alert(err?.error?.message || 'Error al reservar');
     }
   }
 
   async cancel(classId: number) {
     try {
-      await this.servicesService.cancelReservation(classId);
-      await this.loadClasses();
+      const res = await this.servicesService.cancelReservation(classId);
+      if (res.success) {
+        const item = this.gymClasses.find(c => c.id === classId);
+        if (item) item.isReservedByUser = false;
+        console.log('Cancelación exitosa');
+      } else {
+        alert(res.message || 'No se pudo cancelar');
+      }
     } catch (err: any) {
-      alert(err?.error ?? 'Error al cancelar');
+      console.error('Error al cancelar:', err);
+      alert(err?.error?.message || 'Error al cancelar');
     }
   }
 

@@ -3,6 +3,7 @@ import { User } from '../shared/interfaces/user.interface';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { GymClass } from '../shared/interfaces/gym-class.interface';
+import { EnrollmentResponse } from '../shared/interfaces/enrollment-response.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -104,53 +105,37 @@ export class ServicesService {
     return response;
   }
 
-async reserveClass(classId: number): Promise<void> {
-  const token = this.getAuthToken();
-  if (!token) throw new Error('No auth token');
+  async reserveClass(classId: number): Promise<EnrollmentResponse> {
+    const token = this.getAuthToken();
+    const user = this._currentUser();
+    if (!token || !user) throw new Error('Usuario no autenticado');
 
-  const user = this._currentUser();
-  if (!user) throw new Error('No user');
+    const url = `${this.API_URL}/api/Enrollment/enroll`;
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+    const body = { userId: Number(user.id), gymClassId: classId };
 
-  const url = `${this.API_URL}/api/Enrollment/enroll`;
+    return firstValueFrom(this.http.post<EnrollmentResponse>(url, body, { headers }));
+  }
 
-  const headers = new HttpHeaders({
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  });
+  async cancelReservation(classId: number): Promise<EnrollmentResponse> {
+    const token = this.getAuthToken();
+    const user = this._currentUser();
+    if (!token || !user) throw new Error('Usuario no autenticado');
 
-  const body = {
-    userId: Number(user.id),
-    gymClassId: classId
-  };
+    const url = `${this.API_URL}/api/Enrollment/unenroll`;
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+    const body = { userId: Number(user.id), gymClassId: classId };
 
-  await firstValueFrom(
-    this.http.post(url, body, { headers })
-  );
-}
-
-async cancelReservation(classId: number): Promise<void> {
-  const token = this.getAuthToken();
-  if (!token) throw new Error('No auth token');
-
-  const user = this._currentUser();
-  if (!user) throw new Error('No user');
-
-  const url = `${this.API_URL}/api/Enrollment/unenroll`;
-
-  const headers = new HttpHeaders({
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  });
-
-  const body = {
-    userId: Number(user.id),
-    gymClassId: classId
-  };
-
-  await firstValueFrom(
-    this.http.request('delete', url, { body, headers })
-  );
-}
+    return firstValueFrom(
+      this.http.request<EnrollmentResponse>('delete', url, { body, headers })
+    );
+  }
 
 
 }
