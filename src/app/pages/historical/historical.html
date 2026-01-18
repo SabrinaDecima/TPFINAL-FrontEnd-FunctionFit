@@ -1,0 +1,51 @@
+<div class="p-6">
+  <div class="flex items-center gap-3 mb-6">
+    <i class="fas fa-history text-2xl text-gray-800"></i>
+    <h2 class="text-2xl font-bold text-gray-800">Historial de Clases</h2>
+  </div>
+
+  <!-- Si no hay historial -->
+  <div *ngIf="history.length === 0" class="bg-gray-50 border-l-4 border-gray-400 p-6 rounded-lg">
+    <div class="text-center">
+      <i class="fas fa-clock text-4xl text-gray-400 mb-4"></i>
+      <h3 class="text-lg font-medium text-gray-700 mb-2">
+        No hay historial de clases
+      </h3>
+      <p class="text-gray-600">
+        Cuando reserves clases, tu historial aparecerá aquí.
+      </p>
+    </div>
+  </div>
+
+  <!-- Si hay historial -->
+  <ul *ngIf="history.length > 0" class="space-y-4">
+    <li *ngFor="let item of history" class="flex flex-col md:flex-row justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+          <i class="fas fa-dumbbell text-yellow-600 text-xl"></i>
+        </div>
+        <div>
+          <p class="font-medium text-gray-800 text-lg">{{ item.className }}</p>
+          <div class="text-sm text-gray-600 mt-1 flex gap-2 items-center">
+            <i class="far fa-calendar-alt text-gray-500"></i>
+            <span>{{ item.classDate }}</span>
+            <span>- Acción: {{ item.actionDate }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-2 md:mt-0 flex items-center gap-2">
+        <span
+          class="px-3 py-1 rounded-full font-medium text-xs"
+          [ngClass]="{
+            'bg-green-100 text-green-800': item.status === 'Active',
+            'bg-red-100 text-red-800': item.status === 'Cancelled',
+            'bg-blue-100 text-blue-800': item.status === 'Completed'
+          }"
+        >
+          {{ item.status === 'Active' ? 'Activo' : item.status === 'Cancelled' ? 'Cancelado' : 'Completado' }}
+        </span>
+      </div>
+    </li>
+  </ul>
+</div>
