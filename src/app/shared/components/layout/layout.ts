@@ -11,5 +11,5 @@ import { RouterOutlet } from '@angular/router';
   styles: ``
 })
 export default class LayoutComponent {
-  layoutName = 'Angular 20'
+  layoutName = 'FunctionFit';
 }

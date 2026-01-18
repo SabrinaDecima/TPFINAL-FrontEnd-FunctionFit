@@ -25,7 +25,7 @@ export class ServicesService {
         if (['Socio', 'Administrador', 'SuperAdministrador'].includes(user.role)) {
           this._currentUser.set(user);
           this._isAuthenticated.set(true);
-          this._pageTitle.set(`Bienvenido, ${user.name}`);
+          this._pageTitle.set(`Bienvenido, ${user.nombre}`);
         } else {
           this.logout();
         }
@@ -55,15 +55,21 @@ export class ServicesService {
           email: string;
           role: 'Socio' | 'Administrador' | 'SuperAdministrador';
           userId: number;
-          name: string;
+          nombre: string;
+          apellido: string;
+          telefono: string;
+          planId?: number | null;
         }>(url, body)
       );
 
       const user: User = {
         id: res.userId.toString(),
-        name: res.name,
+        nombre: res.nombre,
+        apellido: res.apellido,
+        telefono: res.telefono,
         email: res.email,
-        role: res.role
+        role: res.role,
+        planId: res.planId ?? null
       };
 
       localStorage.setItem('authToken', res.token);
@@ -71,7 +77,7 @@ export class ServicesService {
 
       this._currentUser.set(user);
       this._isAuthenticated.set(true);
-      this._pageTitle.set(`Bienvenido, ${user.name}`);
+      this._pageTitle.set(`Bienvenido, ${user.nombre}`);
 
       return true;
     } catch (error) {

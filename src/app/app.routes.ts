@@ -61,6 +61,13 @@ export const routes: Routes = [
                 canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
             },
             {
+                path: 'admin/user-list',
+                loadComponent: () => import('./pages/admin/user-list/user-list')
+                .then(m => m.UserList),
+                canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
+            },
+
+            {
                 path: 'page-3',
                 loadComponent: () => import('./pages/page-3/page-3'),
                 canActivate: [roleGuard('SuperAdministrador')]
@@ -75,3 +82,7 @@ export const routes: Routes = [
     },
     { path: '**', redirectTo: '' }
 ];
+
+
+
+
