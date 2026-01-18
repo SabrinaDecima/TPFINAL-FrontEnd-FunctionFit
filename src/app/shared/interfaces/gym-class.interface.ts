@@ -7,4 +7,6 @@ export interface GymClass {
   dia: number;
   hora: string;
   isReservedByUser: boolean;
+  maxCapacity: number;        
+  currentEnrollments: number; 
 }
