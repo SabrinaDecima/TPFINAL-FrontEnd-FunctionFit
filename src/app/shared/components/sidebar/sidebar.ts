@@ -21,7 +21,7 @@ export class Sidebar {
     const items: { label: string; route: string }[] = [];
 
     if (user.role === 'Socio') {
-      items.push({ label: 'Clases', route: '/clases' });
+      items.push({ label: 'Clases Disponibles', route: '/clases' });
     }
 
     if (user.role === 'Administrador' || user.role === 'SuperAdministrador') {

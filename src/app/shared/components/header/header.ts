@@ -14,7 +14,6 @@ export class Header {
   private router = inject(Router);
 
   user = this.servicesService._currentUser;
-  pageTitle = this.servicesService._pageTitle;
 
   logout(): void {
     this.servicesService.logout();

@@ -13,7 +13,6 @@ export class ServicesService {
   private http = inject(HttpClient);
 
   _currentUser = signal<User | null>(null);
-  _pageTitle = signal<string>('Angular 20');
   private _isAuthenticated = signal(false);
 
   constructor() {
@@ -25,7 +24,6 @@ export class ServicesService {
         if (['Socio', 'Administrador', 'SuperAdministrador'].includes(user.role)) {
           this._currentUser.set(user);
           this._isAuthenticated.set(true);
-          this._pageTitle.set(`Bienvenido, ${user.name}`);
         } else {
           this.logout();
         }
@@ -34,10 +32,6 @@ export class ServicesService {
         this.logout();
       }
     }
-  }
-
-  setPageTitle(title: string): void {
-    this._pageTitle.set(title);
   }
 
   isAuthenticated() {
@@ -71,7 +65,6 @@ export class ServicesService {
 
       this._currentUser.set(user);
       this._isAuthenticated.set(true);
-      this._pageTitle.set(`Bienvenido, ${user.name}`);
 
       return true;
     } catch (error) {
@@ -83,7 +76,6 @@ export class ServicesService {
   logout(): void {
     this._currentUser.set(null);
     this._isAuthenticated.set(false);
-    this._pageTitle.set('Angular 20');
     localStorage.removeItem('currentUser');
     localStorage.removeItem('authToken');
   }
@@ -137,5 +129,14 @@ export class ServicesService {
     );
   }
 
-
+  async getCurrentUserWithClasses() {
+    const token = this.getAuthToken();
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return await firstValueFrom(
+      this.http.get<{
+        name: string;
+        enrolledClasses: { id: number; nombre: string; dia: number; hora: string }[];
+      }>(`${this.API_URL}/api/User/me`, { headers })
+    );
+  }
 }
