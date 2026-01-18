@@ -84,7 +84,9 @@ export const routes: Routes = [
                 path: 'pagos',
                 loadComponent: () => import('./pages/pagos/pagos'),
                 canActivate: [roleGuard('Socio')]
-            }
+           
+            },
+            { path: 'home', redirectTo: '', pathMatch: 'full' }
         ]
     },
     {

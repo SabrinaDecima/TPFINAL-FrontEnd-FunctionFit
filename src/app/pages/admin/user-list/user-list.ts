@@ -18,7 +18,6 @@ export default class UserList {
 
 
 
-
   planConfig = PLAN_CONFIG;
 
   filteredUsers = computed(() => {

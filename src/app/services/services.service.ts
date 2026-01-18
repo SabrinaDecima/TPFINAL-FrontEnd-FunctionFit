@@ -26,6 +26,7 @@ export class ServicesService {
         if (['Socio', 'Administrador', 'SuperAdministrador'].includes(user.role)) {
           this._currentUser.set(user);
           this._isAuthenticated.set(true);
+
         } else {
           this.logout();
         }
@@ -73,6 +74,7 @@ export class ServicesService {
 
       this._currentUser.set(user);
       this._isAuthenticated.set(true);
+
 
       return true;
     } catch (error) {
