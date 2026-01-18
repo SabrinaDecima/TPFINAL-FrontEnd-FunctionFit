@@ -1,1 +1,22 @@
 @import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
+.glass-card {
+  @apply bg-slate-400/50 backdrop-blur-md border border-slate-800 rounded-xl;
+}
+
+.btn-primary {
+  @apply px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 font-medium;
+}
+
+.input-field {
+  @apply bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all;
+}

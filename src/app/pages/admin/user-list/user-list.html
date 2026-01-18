@@ -1,0 +1,66 @@
+
+    <div class="space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <h1 class="text-2xl font-bold">Administración de Usuarios</h1>
+        <div class="flex gap-2">
+          <input 
+            type="text" 
+            (input)="updateSearch($event)"
+            placeholder="Buscar por nombre o email..." 
+            class="input-field max-w-xs"
+          >
+          <button class="btn-primary flex items-center gap-2">
+            <span>+ Añadir Usuario</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="glass-card overflow-hidden">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-slate-800 text-white text-sm">
+            <tr>
+              <th class="p-4">Usuario</th>
+              <th class="p-4">Contacto</th>
+              <th class="p-4">Plan</th>
+              <th class="p-4 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800 ">
+            @for (user of filteredUsers(); track user.id) {
+              <tr class="hover:bg-slate-800/30 transition-colors">
+                <td class="p-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold border border-blue-500/30">
+                      {{ user.nombre?.charAt(0) ?? 'U' }}
+                    </div>  
+                    <div>
+                      <p class="font-medium">{{ user.nombre }}  {{ user.apellido }} </p>
+                    </div>
+                  </div>
+                </td>   
+                <td class="p-4">
+                  <div>
+                    <p class="text-sm">{{ user.email }}</p>
+                    <p class="text-xs text-slate-500">Telefono: {{ user.telefono || 'N/A' }}</p>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <span class="px-2 py-1 rounded text-xs font-medium"
+                    [ngClass]="planConfig[user.planId ?? 0].class">{{ planConfig[user.planId ?? 0].label }}</span>
+                </td>
+                <td class="p-4 text-right space-x-2">
+                  <button class="text-slate-400 hover:text-white transition">Editar</button>
+                  <button class="text-red-400 hover:text-red-300 transition">Eliminar</button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="p-12 text-center text-slate-500 italic">
+                  No se encontraron usuarios que coincidan con tu búsqueda.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
