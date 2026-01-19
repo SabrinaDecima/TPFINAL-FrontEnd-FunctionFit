@@ -1,51 +1,97 @@
-<div class="p-6">
-  <div class="flex items-center gap-3 mb-6">
-    <i class="fas fa-history text-2xl text-gray-800"></i>
-    <h2 class="text-2xl font-bold text-gray-800">Historial de Clases</h2>
+<div class="p-6 space-y-10">
+
+  <!-- TÍTULO -->
+  <div class="flex items-center gap-3">
+    <i class="fas fa-history text-2xl text-blue-900"></i>
+    <h2 class="text-2xl font-bold text-blue-900">Historial de Clases</h2>
   </div>
 
-  <!-- Si no hay historial -->
-  <div *ngIf="history.length === 0" class="bg-gray-50 border-l-4 border-gray-400 p-6 rounded-lg">
-    <div class="text-center">
-      <i class="fas fa-clock text-4xl text-gray-400 mb-4"></i>
-      <h3 class="text-lg font-medium text-gray-700 mb-2">
-        No hay historial de clases
-      </h3>
-      <p class="text-gray-600">
-        Cuando reserves clases, tu historial aparecerá aquí.
-      </p>
+  <!-- MÉTRICAS -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-slate-800 rounded-2xl p-6 text-center shadow-lg">
+      <p class="text-slate-400 text-sm">Clases Activas</p>
+      <p class="text-3xl font-bold text-green-400">{{ activeCount }}</p>
+    </div>
+
+    <div class="bg-slate-800 rounded-2xl p-6 text-center shadow-lg">
+      <p class="text-slate-400 text-sm">Canceladas</p>
+      <p class="text-3xl font-bold text-red-400">{{ cancelledCount }}</p>
+    </div>
+
+    <div class="bg-slate-800 rounded-2xl p-6 text-center shadow-lg">
+      <p class="text-slate-400 text-sm">Asistencia</p>
+      <p class="text-3xl font-bold text-yellow-400">{{ attendancePercent }}%</p>
     </div>
   </div>
 
-  <!-- Si hay historial -->
-  <ul *ngIf="history.length > 0" class="space-y-4">
-    <li *ngFor="let item of history" class="flex flex-col md:flex-row justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-          <i class="fas fa-dumbbell text-yellow-600 text-xl"></i>
-        </div>
-        <div>
-          <p class="font-medium text-gray-800 text-lg">{{ item.className }}</p>
-          <div class="text-sm text-gray-600 mt-1 flex gap-2 items-center">
-            <i class="far fa-calendar-alt text-gray-500"></i>
-            <span>{{ item.classDate }}</span>
-            <span>- Acción: {{ item.actionDate }}</span>
-          </div>
-        </div>
+  <!-- BARRA DE PROGRESO -->
+  <div class="bg-slate-800 rounded-2xl p-6 shadow-lg">
+    <p class="text-slate-300 mb-3 font-semibold">Progreso mensual</p>
+
+    <div class="w-full bg-slate-700 rounded-full h-4 overflow-hidden">
+      <div
+        class="h-4 bg-yellow-400 transition-all duration-500"
+        [style.width.%]="attendancePercent">
+      </div>
+    </div>
+
+    <p class="text-xs text-slate-400 mt-2">
+      {{ activeCount }} de {{ totalClasses }} clases asistidas
+    </p>
+  </div>
+
+  <!-- RACHA / LOGROS -->
+  <div class="bg-slate-800 rounded-2xl p-6 shadow-lg">
+    <div class="flex items-center gap-3 mb-4">
+      <i class="fas fa-fire text-orange-400 text-xl"></i>
+      <h3 class="text-lg font-semibold text-white">Racha actual</h3>
+    </div>
+
+    <p class="text-3xl font-bold text-orange-400">
+      {{ streak }}
+      <span class="text-base text-slate-400">clases seguidas</span>
+    </p>
+
+    <p class="text-sm text-slate-400 mt-2">
+      ¡Seguí así! Evitá cancelar para mantener tu racha 🔥
+    </p>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="space-y-6">
+    <div
+      *ngFor="let item of history"
+      class="relative pl-8 border-l-2 border-blue-900/40">
+
+      <!-- punto -->
+      <div
+        class="absolute -left-[7px] top-6 w-3 h-3 rounded-full"
+        [ngClass]="{
+          'bg-green-500': item.status === 'Active',
+          'bg-red-500': item.status === 'Cancelled'
+        }">
       </div>
 
-      <div class="mt-2 md:mt-0 flex items-center gap-2">
+      <!-- card -->
+      <div class="bg-slate-800 p-5 rounded-2xl shadow-lg flex items-center justify-between">
+        <div>
+          <p class="text-white font-semibold">{{ item.className }}</p>
+          <p class="text-sm text-slate-400 mt-1">
+            Clase: {{ item.classDate }} · Acción: {{ item.actionDate }}
+          </p>
+        </div>
+
         <span
-          class="px-3 py-1 rounded-full font-medium text-xs"
+          class="px-4 py-1 rounded-full text-xs font-semibold"
           [ngClass]="{
-            'bg-green-100 text-green-800': item.status === 'Active',
-            'bg-red-100 text-red-800': item.status === 'Cancelled',
-            'bg-blue-100 text-blue-800': item.status === 'Completed'
+            'bg-green-400/20 text-green-400': item.status === 'Active',
+            'bg-red-400/20 text-red-400': item.status === 'Cancelled'
           }"
         >
-          {{ item.status === 'Active' ? 'Activo' : item.status === 'Cancelled' ? 'Cancelado' : 'Completado' }}
+          {{ item.status === 'Active' ? 'Activo' : 'Cancelado' }}
         </span>
       </div>
-    </li>
-  </ul>
+    </div>
+  </div>
+
 </div>

@@ -1,110 +1,93 @@
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 py-12">
+<!-- BIENVENIDA + ACCIONES -->
+<div class="py-14 text-center">
 
-  @for (card of cardData; track card.pathname) {
-    <div
-      class="group relative overflow-hidden rounded-3xl
+  <h1 class="text-4xl font-bold text-slate-900 mb-4">
+    ¡Bienvenido a FunctionFit! 
+  </h1>
+
+  <p class="text-lg text-slate-600 max-w-xl mx-auto mb-10">
+    Todo listo para entrenar. Elegí qué querés hacer hoy.
+  </p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
+
+    <!-- Reservar clase -->
+    <a
+      routerLink="/clases"
+      class="group flex items-center justify-between
+             rounded-2xl p-6
              bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900
-             border border-slate-700 shadow-xl
-             hover:shadow-yellow-500/30 hover:-translate-y-2
+             border border-slate-700
+             text-white shadow-lg
+             hover:shadow-yellow-500/20
              transition-all duration-300">
 
-      
-      <div
-        class="absolute inset-0 opacity-0 group-hover:opacity-100
-               bg-gradient-to-br from-yellow-400/20 via-transparent to-yellow-500/20
-               transition-opacity duration-300">
-      </div>
-
-      
-      <div class="relative p-10 flex flex-col items-center text-center h-full text-white">
-
-      
-        <div
-          class="w-16 h-16 mb-6 rounded-2xl flex items-center justify-center
-                 bg-slate-800 text-yellow-400 text-2xl
-                 group-hover:bg-yellow-400 group-hover:text-slate-900
-                 transition-colors duration-300 shadow-lg">
-          <i [class]="card.icon"></i>
-        </div>
-
-        
-        <h3 class="text-2xl font-semibold mb-3">
-          {{ card.title }}
-        </h3>
-
-       
-        <p class="text-base text-slate-300 mb-10 leading-relaxed max-w-sm">
-          {{ card.text }}
+      <div class="text-left">
+        <p class="text-lg font-semibold mb-1">
+          Reservar clase
         </p>
-
-        <a
-          [routerLink]="[card.pathname]"
-          class="mt-auto w-full py-4 rounded-xl text-lg font-semibold
-                 bg-slate-700 text-white
-                 group-hover:bg-yellow-400 group-hover:text-slate-900
-                 transition-all duration-300">
-          {{ card.buttonName }}
-        </a>
-
+        <p class="text-sm text-slate-300">
+          Sumá una clase a tu semana
+        </p>
       </div>
-    </div>
-  }
 
-</div>
+      <i
+        class="fas fa-plus-circle text-3xl text-yellow-400
+               group-hover:scale-110 transition-transform">
+      </i>
+    </a>
 
+    <!-- Ver historial -->
+    <a
+      routerLink="/historial"
+      class="group flex items-center justify-between
+             rounded-2xl p-6
+             bg-slate-100
+             border border-slate-300
+             text-slate-800 shadow-md
+             hover:bg-slate-200
+             transition-all duration-300">
 
-<div class="p-6">
-  <div class="flex items-center gap-3 mb-6">
-    <i class="fas fa-user-circle text-2xl text-gray-800"></i>
-    <h2 class="text-2xl font-bold text-gray-800">Tus clases</h2>
+      <div class="text-left">
+        <p class="text-lg font-semibold mb-1">
+          Ver historial
+        </p>
+        <p class="text-sm text-slate-600">
+          Revisá tu actividad
+        </p>
+      </div>
+
+      <i
+        class="fas fa-clock text-3xl text-slate-600
+               group-hover:scale-110 transition-transform">
+      </i>
+    </a>
+
+    <!-- Pagar cuota -->
+    <a
+      routerLink="/pagos"
+      class="group flex items-center justify-between
+             rounded-2xl p-6
+             bg-gradient-to-br from-yellow-400 to-yellow-500
+             text-slate-900 shadow-lg
+             hover:shadow-yellow-500/40
+             transition-all duration-300">
+
+      <div class="text-left">
+        <p class="text-lg font-semibold mb-1">
+          Pagar cuota
+        </p>
+        <p class="text-sm">
+          Mantené tu membresía activa
+        </p>
+      </div>
+
+      <i
+        class="fas fa-credit-card text-3xl
+               group-hover:scale-110 transition-transform">
+      </i>
+    </a>
+
   </div>
-
-  @if (enrolledClasses().length === 0) {
-    <div class="bg-gray-50 border-l-4 border-gray-400 p-6 rounded-lg">
-      <div class="text-center">
-        <i class="fas fa-clipboard-list text-4xl text-gray-400 mb-4"></i>
-        <h3 class="text-lg font-medium text-gray-700 mb-2">
-          No tenés clases inscriptas
-        </h3>
-        <p class="text-gray-600">
-          Cuando reserves clases, aparecerán aquí con sus horarios.
-        </p>
-      </div>
-    </div>
-  } @else {
-    <div class="mb-4">
-      <p class="text-gray-700">
-        <i class="fas fa-check-circle text-green-600 mr-2"></i>
-        Estás inscripto a
-        <strong>{{ enrolledClasses().length }}</strong>
-        clase(s)
-      </p>
-    </div>
-
-    <ul class="space-y-3">
-      @for (clase of enrolledClasses(); track clase.id) {
-        <li
-          class="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <i class="fas fa-dumbbell text-blue-600"></i>
-            </div>
-            <div>
-              <span class="font-medium text-gray-800">
-                {{ clase.nombre }}
-              </span>
-              <div class="text-sm text-gray-600 mt-1 flex items-center gap-2">
-                <i class="far fa-calendar-alt text-gray-500"></i>
-                {{ getDayName(clase.dia) }} · {{ clase.hora }}
-              </div>
-            </div>
-          </div>
-
-          <span class="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-medium">
-            <i class="fas fa-check mr-1"></i>Inscripto
-          </span>
-        </li>
-      }
-    </ul>
-  }
 </div>
+

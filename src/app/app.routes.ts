@@ -81,9 +81,9 @@ export const routes: Routes = [
                 canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
             },
             {
-                path: 'page-3',
-                loadComponent: () => import('./pages/page-3/page-3'),
-                canActivate: [roleGuard('SuperAdministrador')]
+                path: 'pagos',
+                loadComponent: () => import('./pages/pagos/pagos'),
+                canActivate: [roleGuard('Socio')]
             }
         ]
     },
