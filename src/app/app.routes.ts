@@ -4,6 +4,32 @@ import { Router } from '@angular/router';
 import { ServicesService } from './services/services.service';
 import { roleGuard } from './core/guards/role.guard';
 
+const redirectToRoleHome = () => {
+    const svc = inject(ServicesService);
+    const router = inject(Router);
+    const user = svc._currentUser();
+
+    if (!user) {
+        router.navigate(['/login']);
+        return false;
+    }
+
+    switch (user.role) {
+        case 'Socio':
+            router.navigate(['/home-socio']);
+            break;
+        case 'Administrador':
+            router.navigate(['/home-admin']);
+            break;
+        case 'SuperAdministrador':
+            router.navigate(['/home-super-admin']);
+            break;
+        default:
+            router.navigate(['/login']);
+            return false;
+    }
+    return false;
+};
 
 const authGuard = () => {
     const servicesService = inject(ServicesService);
@@ -47,34 +73,45 @@ export const routes: Routes = [
         canActivate: [authGuard],
         loadComponent: () => import('./shared/components/layout/layout'),
         children: [
-            { path: '', loadComponent: () => import('./pages/home/home') },
+            {
+                path: '',
+                loadComponent: () => import('./pages/role-home-redirect/role-home-redirect')
+            },
+            {
+                path: 'home-socio',
+                loadComponent: () => import('./pages/home-socio/home-socio'),
+                canActivate: [roleGuard('Socio')]
+            },
+            {
+                path: 'home-admin',
+                loadComponent: () => import('./pages/home-admin/home-admin'),
+                canActivate: [roleGuard('Administrador')]
+            },
+            {
+                path: 'home-super-admin',
+                loadComponent: () => import('./pages/home-super-admin/home-super-admin'),
+                canActivate: [roleGuard('SuperAdministrador')]
+            },
             {
                 path: 'clases',
-                loadComponent: () =>
-                import('./pages/clases/clases')
-                .then(m => m.GymClassesComponent),
+                loadComponent: () => import('./pages/clases/clases'),
                 canActivate: [roleGuard('Socio')]
             },
             {
                 path: 'historial',
-                loadComponent: () => 
-                import('./pages/historical/historical')
-                .then(m => m.HistoricalComponent),
+                loadComponent: () => import('./pages/historical/historical'),
                 canActivate: [roleGuard('Socio')]
             },
             {
                 path: 'admin/user-list',
-                loadComponent: () => import('./pages/admin/user-list/user-list')
-                .then(m => m.UserList),
+                loadComponent: () => import('./pages/admin/user-list/user-list'),
                 canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
             },
-
             {
                 path: 'page-3',
                 loadComponent: () => import('./pages/page-3/page-3'),
                 canActivate: [roleGuard('SuperAdministrador')]
-            },
-            { path: 'home', redirectTo: '', pathMatch: 'full' }
+            }
         ]
     },
     {

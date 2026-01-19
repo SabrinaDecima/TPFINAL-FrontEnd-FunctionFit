@@ -10,14 +10,14 @@ import { CommonModule, DatePipe } from '@angular/common';
   templateUrl: './user-list.html',
   styleUrl: './user-list.scss',
 })
-export class UserList {
+export default class UserList {
   private userService = inject(UserService);
 
   searchTerm = signal('');
   users = this.userService.users;
 
 
-  
+
 
   planConfig = PLAN_CONFIG;
 
@@ -26,15 +26,15 @@ export class UserList {
     const allUsers = this.users();
 
     if (!allUsers || allUsers.length === 0) {
-    return [];
-  }
-  return allUsers.filter(u =>
-    (u.nombre?.toLowerCase() ?? '').includes(term) ||
-    (u.email?.toLowerCase() ?? '').includes(term) ||
-    (u.apellido?.toLowerCase() ?? '').includes(term)
-  );
-  
-   
+      return [];
+    }
+    return allUsers.filter(u =>
+      (u.nombre?.toLowerCase() ?? '').includes(term) ||
+      (u.email?.toLowerCase() ?? '').includes(term) ||
+      (u.apellido?.toLowerCase() ?? '').includes(term)
+    );
+
+
   });
 
   updateSearch(event: Event) {

@@ -5,14 +5,14 @@ import { Historical } from '../../shared/interfaces/historical.interface';
 
 @Component({
   selector: 'app-historical',
-  standalone: true, // <-- importante
-  imports: [CommonModule], // <-- importá CommonModule
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './historical.html',
 })
-export class HistoricalComponent implements OnInit {
+export default class HistoricalComponent implements OnInit {
   history: Historical[] = [];
 
-  constructor(private service: ServicesService) {}
+  constructor(private service: ServicesService) { }
 
   async ngOnInit() {
     try {

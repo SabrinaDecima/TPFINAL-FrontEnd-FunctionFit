@@ -11,7 +11,7 @@ import { ToastrService } from 'ngx-toastr';
   standalone: true,
   imports: [CommonModule]
 })
-export class GymClassesComponent implements OnInit {
+export default class GymClassesComponent implements OnInit {
   groupedClasses: GroupedGymClass[] = [];
   loading = false;
   error: string | null = null;

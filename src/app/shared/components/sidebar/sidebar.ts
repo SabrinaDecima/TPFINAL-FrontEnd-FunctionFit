@@ -25,7 +25,6 @@ export class Sidebar {
     }
 
     if (user.role === 'Administrador' || user.role === 'SuperAdministrador') {
-      items.push({ label: 'Page-2', route: '/page-2' });
       items.push({ label: 'Usuarios', route: '/admin/user-list' });
     }
 
