@@ -18,18 +18,21 @@ export class Sidebar {
     const user = this.currentUser();
     if (!user) return [];
 
-    const items: { label: string; route: string }[] = [];
+    const items: { label: string; route: string; icon: string }[] = [];
 
     if (user.role === 'Socio') {
-      items.push({ label: 'Clases Disponibles', route: '/clases' });
+      items.push(
+        { label: 'Clases Disponibles', route: '/clases', icon: 'fa-dumbbell' },
+        { label: 'Historial', route: '/historial', icon: 'fa-history' }
+      );
     }
 
     if (user.role === 'Administrador' || user.role === 'SuperAdministrador') {
-      items.push({ label: 'Usuarios', route: '/admin/user-list' });
+      items.push({ label: 'Usuarios', route: '/admin/user-list', icon: 'fa-users' });
     }
 
     if (user.role === 'SuperAdministrador') {
-      items.push({ label: 'Page-3', route: '/page-3' });
+      items.push({ label: 'Page-3', route: '/page-3', icon: 'fa-cog' });
     }
 
     return items;

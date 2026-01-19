@@ -4,33 +4,6 @@ import { Router } from '@angular/router';
 import { ServicesService } from './services/services.service';
 import { roleGuard } from './core/guards/role.guard';
 
-const redirectToRoleHome = () => {
-    const svc = inject(ServicesService);
-    const router = inject(Router);
-    const user = svc._currentUser();
-
-    if (!user) {
-        router.navigate(['/login']);
-        return false;
-    }
-
-    switch (user.role) {
-        case 'Socio':
-            router.navigate(['/home-socio']);
-            break;
-        case 'Administrador':
-            router.navigate(['/home-admin']);
-            break;
-        case 'SuperAdministrador':
-            router.navigate(['/home-super-admin']);
-            break;
-        default:
-            router.navigate(['/login']);
-            return false;
-    }
-    return false;
-};
-
 const authGuard = () => {
     const servicesService = inject(ServicesService);
     const router = inject(Router);

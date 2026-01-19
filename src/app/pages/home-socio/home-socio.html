@@ -37,14 +37,14 @@
           {{ card.text }}
         </p>
 
-        <button
+        <a
           [routerLink]="[card.pathname]"
           class="mt-auto w-full py-4 rounded-xl text-lg font-semibold
                  bg-slate-700 text-white
                  group-hover:bg-yellow-400 group-hover:text-slate-900
                  transition-all duration-300">
           {{ card.buttonName }}
-        </button>
+        </a>
 
       </div>
     </div>
