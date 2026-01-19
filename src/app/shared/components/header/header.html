@@ -3,7 +3,7 @@
 
   <div class="flex items-center gap-4">
     @if (user(); as u) {
-      <span class="text-white text-lg font-medium hidden sm:block">Hola, {{ u.name }}</span>
+      <span class="text-white text-lg font-medium hidden sm:block">Hola, {{ u.email }}</span>
       
       <button 
         (click)="logout()" 
