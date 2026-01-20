@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ServicesService } from '../../services/services.service';
 import { CommonModule } from '@angular/common';
 import { GymClass } from '../../shared/interfaces/gym-class.interface';
 import { GroupedGymClass, GymClassTurn } from '../../shared/interfaces/grouped-gym-class.interface';
 import { ToastrService } from 'ngx-toastr';
+import { Payment } from '../../shared/interfaces/payment.interface';
 
 @Component({
   selector: 'app-gym-classes',
@@ -16,13 +17,77 @@ export default class GymClassesComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  constructor(
-    private servicesService: ServicesService,
-    private toastr: ToastrService
-  ) { }
+  // Inyectamos servicios
+  private servicesService = inject(ServicesService);
+  private toastr = inject(ToastrService);
+
+  // Estado de pagos
+  currentPayment: Payment | null = null;
 
   ngOnInit(): void {
+    this.loadPayments(); // cargamos pagos primero
     this.loadClasses();
+  }
+
+  // Cargamos pagos pendientes del usuario
+  async loadPayments() {
+    try {
+      const pending = await this.servicesService.getPendingPayment();
+      this.currentPayment = pending.length ? pending[0] : null;
+    } catch (err) {
+      console.error('Error al cargar pagos:', err);
+      this.currentPayment = null;
+    }
+  }
+
+  // Bloqueo de reserva si hay pagos impagos
+  canReserve(): boolean {
+    return !this.currentPayment || this.currentPayment.Pagado;
+  }
+
+  async reserve(classId: number) {
+    if (!this.canReserve()) {
+      this.toastr.warning('No podés reservar hasta pagar tu cuota mensual', 'Atención');
+      return;
+    }
+
+    try {
+      const res = await this.servicesService.reserveClass(classId);
+      if (res.success) {
+        this.updateTurnoState(classId, true, res.currentEnrollments, res.maxCapacity);
+        this.toastr.success('¡Reserva confirmada!');
+      } else {
+        this.toastr.error(res.message || 'No se pudo reservar', 'Error');
+      }
+    } catch (err: any) {
+      this.toastr.error(err?.error?.message || 'Error al reservar', 'Error');
+    }
+  }
+
+  async cancel(classId: number) {
+    try {
+      const res = await this.servicesService.cancelReservation(classId);
+      if (res.success) {
+        this.updateTurnoState(classId, false, res.currentEnrollments, res.maxCapacity);
+        this.toastr.info('Reserva cancelada');
+      } else {
+        this.toastr.warning(res.message || 'No se pudo cancelar', 'Atención');
+      }
+    } catch (err: any) {
+      this.toastr.error(err?.error?.message || 'Error al cancelar', 'Error');
+    }
+  }
+
+  private updateTurnoState(classId: number, isReserved: boolean, currentEnrollments?: number, maxCapacity?: number) {
+    for (const group of this.groupedClasses) {
+      const turno = group.turnos.find(t => t.id === classId);
+      if (turno) {
+        turno.isReservedByUser = isReserved;
+        if (currentEnrollments !== undefined) turno.currentEnrollments = currentEnrollments;
+        if (maxCapacity !== undefined) turno.maxCapacity = maxCapacity;
+        break;
+      }
+    }
   }
 
   async loadClasses() {
@@ -62,60 +127,6 @@ export default class GymClassesComponent implements OnInit {
       map.get(c.nombre)!.turnos.push(turno);
     }
     return Array.from(map.values());
-  }
-
-  async reserve(classId: number) {
-    try {
-      const res = await this.servicesService.reserveClass(classId);
-      if (res.success) {
-        this.updateTurnoState(
-          classId,
-          true,
-          res.currentEnrollments,
-          res.maxCapacity
-        );
-        this.toastr.success('¡Reserva confirmada!');
-      } else {
-        this.toastr.error(res.message || 'No se pudo reservar', 'Error');
-      }
-    } catch (err: any) {
-      this.toastr.error(err?.error?.message || 'Error al reservar', 'Error');
-    }
-  }
-
-  async cancel(classId: number) {
-    try {
-      const res = await this.servicesService.cancelReservation(classId);
-      if (res.success) {
-        this.updateTurnoState(
-          classId,
-          false,
-          res.currentEnrollments,
-          res.maxCapacity
-        );
-        this.toastr.info('Reserva cancelada');
-      } else {
-        this.toastr.warning(res.message || 'No se pudo cancelar', 'Atención');
-      }
-    } catch (err: any) {
-      this.toastr.error(err?.error?.message || 'Error al cancelar', 'Error');
-    }
-  }
-
-  private updateTurnoState(classId: number, isReserved: boolean, currentEnrollments?: number, maxCapacity?: number) {
-    for (const group of this.groupedClasses) {
-      const turno = group.turnos.find(t => t.id === classId);
-      if (turno) {
-        turno.isReservedByUser = isReserved;
-        if (currentEnrollments !== undefined) {
-          turno.currentEnrollments = currentEnrollments;
-        }
-        if (maxCapacity !== undefined) {
-          turno.maxCapacity = maxCapacity;
-        }
-        break;
-      }
-    }
   }
 
   getDayName(day: number): string {

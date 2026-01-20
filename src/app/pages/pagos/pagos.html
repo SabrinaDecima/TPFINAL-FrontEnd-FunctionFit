@@ -1,0 +1,56 @@
+<div class="max-w-4xl mx-auto py-12 space-y-8">
+
+ 
+  <div *ngIf="currentPayment()"
+       class="rounded-2xl p-6 shadow-lg"
+       [ngClass]="currentPayment()?.Pagado ? 'bg-green-500 text-white' : 'bg-yellow-400 text-slate-900'">
+
+    <h2 class="text-xl font-semibold mb-2">Estado de tu membresía</h2>
+
+    <p class="text-lg">
+      {{ formatDate(currentPayment()?.Fecha) }} · 
+      <span class="font-bold">
+        {{ currentPayment()?.Pagado ? 'Pagado' : 'Impago' }}
+      </span>
+    </p>
+
+    
+    <button *ngIf="!currentPayment()?.Pagado"
+            (click)="pay()"
+            class="mt-4 bg-slate-900 text-yellow-400 px-6 py-2 rounded-xl font-semibold hover:bg-slate-800 transition">
+      Pagar ahora
+    </button>
+
+    <p *ngIf="currentPayment()?.Pagado" class="mt-2">
+      ¡Membresía activa! Ya podés reservar clases.
+    </p>
+  </div>
+
+  <div *ngIf="!currentPayment()" class="text-center text-slate-600">
+    ¡No hay pagos pendientes!
+  </div>
+
+  
+  <div>
+    <h3 class="text-lg font-semibold mb-4">Historial de pagos</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div *ngFor="let pago of paymentHistory()"
+           class="rounded-2xl p-4 border shadow-md hover:shadow-yellow-400 transition">
+
+        <p><span class="font-semibold">Mes:</span> {{ formatDate(pago.Fecha) }}</p>
+        <p><span class="font-semibold">Monto:</span> ${{ pago.Monto }}</p>
+        <p>
+          <span class="font-semibold">Estado:</span>
+          <span [ngClass]="pago.Pagado ? 'text-green-500' : 'text-red-500'">
+            {{ pago.Pagado ? 'Pagado' : 'Impago' }}
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading()" class="text-center text-slate-400">
+    Cargando pagos...
+  </div>
+
+</div>

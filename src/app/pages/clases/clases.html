@@ -1,34 +1,31 @@
 <div class="p-6 max-w-[95vw] mx-auto">
 
-  
-  <div class="flex flex-col items-center gap-2 mb-10 text-center">
-    
-    <i class="fas fa-dumbbell text-5xl text-yellow-400"></i>
-
-    <h2 class="text-2xl font-bold text-gray-100">
-      Clases disponibles
-    </h2>
-
-    
-    <p class="text-blue-1100 text-xl font-semibold">
-      Elegí tu clase y reservá tu lugar
-    </p>
-
+  <!-- Aviso pago pendiente -->
+  <div *ngIf="currentPayment && !currentPayment.Pagado"
+       class="mb-6 p-4 bg-yellow-200 text-yellow-800 rounded-lg text-center font-semibold">
+    Tenés un pago pendiente. No podés reservar clases hasta regularizar tu cuota.
   </div>
 
-  
+  <!-- Encabezado -->
+  <div class="flex flex-col items-center gap-2 mb-10 text-center">
+    <i class="fas fa-dumbbell text-5xl text-yellow-400"></i>
+    <h2 class="text-2xl font-bold text-gray-100">Clases disponibles</h2>
+    <p class="text-blue-1100 text-xl font-semibold">Elegí tu clase y reservá tu lugar</p>
+  </div>
+
+  <!-- Loading -->
   <div *ngIf="loading" class="text-center text-gray-400 py-10">
     <i class="fas fa-spinner animate-spin text-xl mr-2"></i>
     Cargando clases...
   </div>
 
-  
+  <!-- Error -->
   <div *ngIf="error" class="text-red-500 text-center py-4">
     <i class="fas fa-exclamation-circle mr-2"></i>
     {{ error }}
   </div>
 
-  
+  <!-- Clases -->
   <div *ngIf="!loading && !error"
        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
 
@@ -37,29 +34,18 @@
                 border border-white/5
                 hover:scale-[1.015] transition-transform">
 
-      <!-- Imagen (VIENE DEL BACKEND) -->
-      <img
-        [src]="group.imageUrl"
-        [alt]="group.nombre"
-        class="h-36 w-full object-cover opacity-90"
-      />
+      <!-- Imagen -->
+      <img [src]="group.imageUrl" [alt]="group.nombre"
+           class="h-36 w-full object-cover opacity-90"/>
 
-      
       <div class="p-5 flex flex-col text-center h-full">
+        <h3 class="text-lg font-semibold text-white mb-2">{{ group.nombre }}</h3>
+        <p class="text-sm text-gray-400 mb-4">{{ group.descripcion }}</p>
 
-        <h3 class="text-lg font-semibold text-white mb-2">
-          {{ group.nombre }}
-        </h3>
-
-        <p class="text-sm text-gray-400 mb-4">
-          {{ group.descripcion }}
-        </p>
-
-        
+        <!-- Turnos -->
         <div class="space-y-3 flex-1">
           <div *ngFor="let turno of group.turnos"
-               class="bg-white/5 rounded-lg p-3
-                      flex flex-col items-center gap-1">
+               class="bg-white/5 rounded-lg p-3 flex flex-col items-center gap-1">
 
             <div class="text-sm text-gray-300 flex items-center gap-2">
               <i class="far fa-calendar-alt text-blue-700"></i>
@@ -75,34 +61,27 @@
               {{ getAvailabilityMessage(turno) }}
             </span>
 
-            
-            <button
-              *ngIf="!turno.isReservedByUser"
-              (click)="reserve(turno.id)"
-              [disabled]="turno.currentEnrollments >= turno.maxCapacity"
-              class="mt-2 w-full text-sm py-2 rounded-md font-medium transition
-                     bg-gray-700 text-white
-                     hover:bg-yellow-400 hover:text-black
-                     disabled:bg-gray-600 disabled:text-gray-400">
+            <button *ngIf="!turno.isReservedByUser"
+                    (click)="reserve(turno.id)"
+                    [disabled]="!canReserve() || turno.currentEnrollments >= turno.maxCapacity"
+                    class="mt-2 w-full text-sm py-2 rounded-md font-medium transition
+                           bg-gray-700 text-white
+                           hover:bg-yellow-400 hover:text-black
+                           disabled:bg-gray-600 disabled:text-gray-400">
               Reservar
             </button>
 
-            
-            <button
-              *ngIf="turno.isReservedByUser"
-              (click)="cancel(turno.id)"
-              class="mt-2 w-full text-sm py-2 rounded-md font-medium transition
-                     bg-red-600 text-white hover:bg-red-700">
+            <button *ngIf="turno.isReservedByUser"
+                    (click)="cancel(turno.id)"
+                    class="mt-2 w-full text-sm py-2 rounded-md font-medium transition
+                           bg-red-600 text-white hover:bg-red-700">
               Cancelar
             </button>
 
           </div>
         </div>
 
-        
-        <div class="mt-4 pt-3 border-t border-white/10
-                    text-sm text-gray-400
-                    flex items-center justify-center gap-2">
+        <div class="mt-4 pt-3 border-t border-white/10 text-sm text-gray-400 flex items-center justify-center gap-2">
           <i class="far fa-clock text-blue-700"></i>
           {{ group.duracionMinutos }} min
         </div>
