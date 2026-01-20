@@ -1,0 +1,93 @@
+
+<div class="py-14 text-center">
+
+  <h1 class="text-4xl font-bold text-slate-900 mb-4">
+    ¡Bienvenido a FunctionFit! 
+  </h1>
+
+  <p class="text-lg text-slate-600 max-w-xl mx-auto mb-10">
+    Todo listo para entrenar. Elegí qué querés hacer hoy.
+  </p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
+
+   
+    <a
+      routerLink="/clases"
+      class="group flex items-center justify-between
+             rounded-2xl p-6
+             bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900
+             border border-slate-700
+             text-white shadow-lg
+             hover:shadow-yellow-500/20
+             transition-all duration-300">
+
+      <div class="text-left">
+        <p class="text-lg font-semibold mb-1">
+          Reservar clase
+        </p>
+        <p class="text-sm text-slate-300">
+          Sumá una clase a tu semana
+        </p>
+      </div>
+
+      <i
+        class="fas fa-plus-circle text-3xl text-yellow-400
+               group-hover:scale-110 transition-transform">
+      </i>
+    </a>
+
+
+    <a
+      routerLink="/historial"
+      class="group flex items-center justify-between
+             rounded-2xl p-6
+             bg-slate-100
+             border border-slate-300
+             text-slate-800 shadow-md
+             hover:bg-slate-200
+             transition-all duration-300">
+
+      <div class="text-left">
+        <p class="text-lg font-semibold mb-1">
+          Ver historial
+        </p>
+        <p class="text-sm text-slate-600">
+          Revisá tu actividad
+        </p>
+      </div>
+
+      <i
+        class="fas fa-clock text-3xl text-slate-600
+               group-hover:scale-110 transition-transform">
+      </i>
+    </a>
+
+   
+    <a
+      routerLink="/pagos"
+      class="group flex items-center justify-between
+             rounded-2xl p-6
+             bg-gradient-to-br from-yellow-400 to-yellow-500
+             text-slate-900 shadow-lg
+             hover:shadow-yellow-500/40
+             transition-all duration-300">
+
+      <div class="text-left">
+        <p class="text-lg font-semibold mb-1">
+          Pagar cuota
+        </p>
+        <p class="text-sm">
+          Mantené tu membresía activa
+        </p>
+      </div>
+
+      <i
+        class="fas fa-credit-card text-3xl
+               group-hover:scale-110 transition-transform">
+      </i>
+    </a>
+
+  </div>
+</div>
+

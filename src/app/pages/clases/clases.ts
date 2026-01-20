@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ServicesService } from '../../services/services.service';
 import { CommonModule } from '@angular/common';
 import { GymClass } from '../../shared/interfaces/gym-class.interface';
 import { GroupedGymClass, GymClassTurn } from '../../shared/interfaces/grouped-gym-class.interface';
 import { ToastrService } from 'ngx-toastr';
+import { Payment } from '../../shared/interfaces/payment.interface';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmationDialog } from '../../shared/components/confirmation-dialog/confirmation-dialog';
 
 @Component({
   selector: 'app-gym-classes',
@@ -11,18 +14,107 @@ import { ToastrService } from 'ngx-toastr';
   standalone: true,
   imports: [CommonModule]
 })
-export class GymClassesComponent implements OnInit {
+export default class GymClassesComponent implements OnInit {
   groupedClasses: GroupedGymClass[] = [];
   loading = false;
   error: string | null = null;
 
-  constructor(
-    private servicesService: ServicesService,
-    private toastr: ToastrService
-  ) { }
+  // Inyectamos servicios
+  private servicesService = inject(ServicesService);
+  private toastr = inject(ToastrService);
+  private dialog = inject(MatDialog);
+
+  // Estado de pagos
+  currentPayment: Payment | null = null;
 
   ngOnInit(): void {
+    this.loadPayments(); // cargamos pagos primero
     this.loadClasses();
+  }
+
+  // Cargamos pagos pendientes del usuario
+  async loadPayments() {
+    try {
+      const pending = await this.servicesService.getPendingPayment();
+      this.currentPayment = pending.length ? pending[0] : null;
+    } catch (err) {
+      console.error('Error al cargar pagos:', err);
+      this.currentPayment = null;
+    }
+  }
+
+  // Bloqueo de reserva si hay pagos impagos
+  canReserve(): boolean {
+    return !this.currentPayment || this.currentPayment.Pagado;
+  }
+
+  async reserve(classId: number) {
+    if (!this.canReserve()) {
+      this.toastr.warning('No podés reservar hasta pagar tu cuota mensual', 'Atención');
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ConfirmationDialog, {
+      data: {
+        title: 'Confirmar reserva',
+        message: '¿Estás seguro de que querés reservar esta clase?'
+      },
+      panelClass: 'ff-confirm-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(async (result) => {
+      if (result) {
+        try {
+          const res = await this.servicesService.reserveClass(classId);
+          if (res.success) {
+            this.updateTurnoState(classId, true, res.currentEnrollments, res.maxCapacity);
+            this.toastr.success('¡Reserva confirmada!');
+          } else {
+            this.toastr.error(res.message || 'No se pudo reservar', 'Error');
+          }
+        } catch (err: any) {
+          this.toastr.error(err?.error?.message || 'Error al reservar', 'Error');
+        }
+      }
+    });
+  }
+
+  async cancel(classId: number) {
+    const dialogRef = this.dialog.open(ConfirmationDialog, {
+      data: {
+        title: 'Cancelar reserva',
+        message: '¿Estás seguro de que querés cancelar esta clase?'
+      },
+      panelClass: 'ff-confirm-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(async (result) => {
+      if (result) {
+        try {
+          const res = await this.servicesService.cancelReservation(classId);
+          if (res.success) {
+            this.updateTurnoState(classId, false, res.currentEnrollments, res.maxCapacity);
+            this.toastr.info('Reserva cancelada');
+          } else {
+            this.toastr.warning(res.message || 'No se pudo cancelar', 'Atención');
+          }
+        } catch (err: any) {
+          this.toastr.error(err?.error?.message || 'Error al cancelar', 'Error');
+        }
+      }
+    });
+  }
+
+  private updateTurnoState(classId: number, isReserved: boolean, currentEnrollments?: number, maxCapacity?: number) {
+    for (const group of this.groupedClasses) {
+      const turno = group.turnos.find(t => t.id === classId);
+      if (turno) {
+        turno.isReservedByUser = isReserved;
+        if (currentEnrollments !== undefined) turno.currentEnrollments = currentEnrollments;
+        if (maxCapacity !== undefined) turno.maxCapacity = maxCapacity;
+        break;
+      }
+    }
   }
 
   async loadClasses() {
@@ -62,60 +154,6 @@ export class GymClassesComponent implements OnInit {
       map.get(c.nombre)!.turnos.push(turno);
     }
     return Array.from(map.values());
-  }
-
-  async reserve(classId: number) {
-    try {
-      const res = await this.servicesService.reserveClass(classId);
-      if (res.success) {
-        this.updateTurnoState(
-          classId,
-          true,
-          res.currentEnrollments,
-          res.maxCapacity
-        );
-        this.toastr.success('¡Reserva confirmada!');
-      } else {
-        this.toastr.error(res.message || 'No se pudo reservar', 'Error');
-      }
-    } catch (err: any) {
-      this.toastr.error(err?.error?.message || 'Error al reservar', 'Error');
-    }
-  }
-
-  async cancel(classId: number) {
-    try {
-      const res = await this.servicesService.cancelReservation(classId);
-      if (res.success) {
-        this.updateTurnoState(
-          classId,
-          false,
-          res.currentEnrollments,
-          res.maxCapacity
-        );
-        this.toastr.info('Reserva cancelada');
-      } else {
-        this.toastr.warning(res.message || 'No se pudo cancelar', 'Atención');
-      }
-    } catch (err: any) {
-      this.toastr.error(err?.error?.message || 'Error al cancelar', 'Error');
-    }
-  }
-
-  private updateTurnoState(classId: number, isReserved: boolean, currentEnrollments?: number, maxCapacity?: number) {
-    for (const group of this.groupedClasses) {
-      const turno = group.turnos.find(t => t.id === classId);
-      if (turno) {
-        turno.isReservedByUser = isReserved;
-        if (currentEnrollments !== undefined) {
-          turno.currentEnrollments = currentEnrollments;
-        }
-        if (maxCapacity !== undefined) {
-          turno.maxCapacity = maxCapacity;
-        }
-        break;
-      }
-    }
   }
 
   getDayName(day: number): string {

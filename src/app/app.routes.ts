@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { ServicesService } from './services/services.service';
 import { roleGuard } from './core/guards/role.guard';
 
-
 const authGuard = () => {
     const servicesService = inject(ServicesService);
     const router = inject(Router);
@@ -47,32 +46,45 @@ export const routes: Routes = [
         canActivate: [authGuard],
         loadComponent: () => import('./shared/components/layout/layout'),
         children: [
-            { path: '', loadComponent: () => import('./pages/home/home') },
             {
-                path: 'clases',
-                loadComponent: () =>
-                import('./pages/clases/clases')
-                .then(m => m.GymClassesComponent),
+                path: '',
+                loadComponent: () => import('./pages/role-home-redirect/role-home-redirect')
+            },
+            {
+                path: 'home-socio',
+                loadComponent: () => import('./pages/home-socio/home-socio'),
                 canActivate: [roleGuard('Socio')]
             },
             {
-                path: 'page-2',
-                loadComponent: () => import('./pages/page-2/page-2'),
-                canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
+                path: 'home-admin',
+                loadComponent: () => import('./pages/home-admin/home-admin'),
+                canActivate: [roleGuard('Administrador')]
+            },
+            {
+                path: 'home-super-admin',
+                loadComponent: () => import('./pages/home-super-admin/home-super-admin'),
+                canActivate: [roleGuard('SuperAdministrador')]
+            },
+            {
+                path: 'clases',
+                loadComponent: () => import('./pages/clases/clases'),
+                canActivate: [roleGuard('Socio')]
+            },
+            {
+                path: 'historial',
+                loadComponent: () => import('./pages/historical/historical'),
+                canActivate: [roleGuard('Socio')]
             },
             {
                 path: 'admin/user-list',
-                loadComponent: () => import('./pages/admin/user-list/user-list')
-                .then(m => m.UserList),
+                loadComponent: () => import('./pages/admin/user-list/user-list'),
                 canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
             },
-
             {
-                path: 'page-3',
-                loadComponent: () => import('./pages/page-3/page-3'),
-                canActivate: [roleGuard('SuperAdministrador')]
-            },
-            { path: 'home', redirectTo: '', pathMatch: 'full' }
+                path: 'pagos',
+                loadComponent: () => import('./pages/pagos/pagos'),
+                canActivate: [roleGuard('Socio')]
+            }
         ]
     },
     {

@@ -1,5 +1,4 @@
 <aside class="bg-gray-850 w-64 min-h-screen p-4 flex flex-col">
-  <!-- Logo centrado -->
   <div class="flex justify-center" style="margin-bottom: 20%;">
     <a routerLink="/">
       <img src="logo-gym-transparent.png" alt="FunctionFit" class="h-18 w-auto" />
@@ -9,25 +8,13 @@
   <nav class="flex-1">
     <ul class="space-y-2">
       @for (item of menuItems(); track item.route) {
-        <li>
-          <a 
-            [routerLink]="item.route" 
-            routerLinkActive="bg-gray-700 text-yellow-300"
-            class="flex items-center gap-3 w-full p-3 rounded-lg text-white hover:bg-gray-700 hover:text-yellow-300 transition-colors"
-          >
-            @if (item.label === 'Clases Disponibles') {
-              <i class="fas fa-dumbbell text-lg"></i>
-            } @else if (item.label === 'Page-2') {
-              <i class="fas fa-chart-line text-lg"></i>
-            } @else if (item.label === 'Page-3') {
-              <i class="fas fa-cog text-lg"></i>
-            } @else {
-              <i class="fas fa-file text-lg"></i>
-            }
-            
-            <span class="text-lg">{{ item.label }}</span>
-          </a>
-        </li>
+      <li>
+        <a [routerLink]="item.route" routerLinkActive="bg-gray-700 text-yellow-300"
+          class="flex items-center gap-3 w-full p-3 rounded-lg text-white hover:bg-gray-700 hover:text-yellow-300 transition-colors">
+          <i class="fas {{ item.icon }} text-lg flex-shrink-0"></i>
+          <span class="text-lg truncate">{{ item.label }}</span>
+        </a>
+      </li>
       }
     </ul>
   </nav>

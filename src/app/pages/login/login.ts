@@ -26,9 +26,9 @@ export default class Login {
     return !!ctrl && ctrl.invalid && ctrl.touched;
   }
 
-  goHome(): void {
-    this.router.navigateByUrl('/home');
-  }
+  // goHome(): void {
+  //   this.router.navigateByUrl('/home');
+  // }
 
   async onSubmit(): Promise<void> {
     if (this.loginForm.invalid) {

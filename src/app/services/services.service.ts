@@ -4,6 +4,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { GymClass } from '../shared/interfaces/gym-class.interface';
 import { EnrollmentResponse } from '../shared/interfaces/enrollment-response.interface';
+import { Historical } from '../shared/interfaces/historical.interface';
+import { Payment} from '../shared/interfaces/payment.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -147,4 +149,37 @@ export class ServicesService {
       }>(`${this.API_URL}/api/User/me`, { headers })
     );
   }
+
+  async getUserHistory(): Promise<Historical[]> {
+  const token = this.getAuthToken();
+  const user = this._currentUser();
+  if (!token || !user) throw new Error('Usuario no autenticado');
+
+  const url = `${this.API_URL}/api/Historical/user/${user.id}`;
+  const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+
+  return await firstValueFrom(this.http.get<Historical[]>(url, { headers }));
+  }
+
+async getPendingPayment(): Promise<Payment[]> {
+    const res = await fetch('/api/payment/user/1/payments/pending'); 
+    return res.json(); 
+  }
+
+  
+  async getPaymentHistory(): Promise<Payment[]> {
+    const res = await fetch('/api/payment/user/1'); 
+    return res.json();
+  }
+
+  
+  async createMercadoPagoPayment(request: { Monto: number }): Promise<{ Url: string }> {
+    const res = await fetch('/api/payment/mercadopago', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request)
+    });
+    return res.json();
+  }
 }
+
