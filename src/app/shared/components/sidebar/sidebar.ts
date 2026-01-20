@@ -24,7 +24,7 @@ export class Sidebar {
       items.push(
         { label: 'Clases Disponibles', route: '/clases', icon: 'fa-dumbbell' },
         { label: 'Historial', route: '/historial', icon: 'fa-history' },
-        { label: 'Pagos', route: '/pagos', icon: 'fa-history' }
+        { label: 'Pagos', route: '/pagos', icon: 'fa fa-credit-card' }
       );
     }
 

@@ -1,3 +1,36 @@
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((color: (primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    ));
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+}
+
 @import "tailwindcss";
 
 :root {
@@ -19,4 +52,94 @@ body {
 
 .input-field {
   @apply bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+
+// Estilo personalizado para modales de FunctionFit (versión clara)
+.ff-confirm-dialog .mat-mdc-dialog-container {
+  background: transparent;
+  padding: 0;
+}
+
+.ff-confirm-dialog .mat-mdc-dialog-surface {
+  background-color: #ffffff;
+  /* blanco */
+  border: 1px solid #e2e8f0;
+  /* gray-200 */
+  border-radius: 1rem;
+  /* rounded-2xl */
+  color: #1e293b;
+  /* slate-800 */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  padding: 1.5rem;
+}
+
+// Título
+.ff-confirm-dialog .mat-mdc-dialog-title {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #1e293b;
+  /* slate-800 */
+  margin-bottom: 0.5rem;
+  padding: 0;
+}
+
+// Contenido
+.ff-confirm-dialog .mat-mdc-dialog-content {
+  color: #475569;
+  /* slate-600 */
+  margin-bottom: 1.5rem;
+  padding: 0;
+}
+
+// Acciones (botones)
+.ff-confirm-dialog .mat-mdc-dialog-actions {
+  padding: 0;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+// Botón "Cancelar"
+.ff-confirm-dialog .mat-mdc-dialog-actions .mat-mdc-button {
+  color: #475569;
+  /* slate-600 */
+  background: #f1f5f9;
+  /* gray-100 */
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.ff-confirm-dialog .mat-mdc-dialog-actions .mat-mdc-button:hover {
+  background: #e2e8f0;
+  /* gray-200 */
+}
+
+// Botón "Confirmar" (mat-raised-button con color="warn")
+.ff-confirm-dialog .mat-mdc-dialog-actions .mat-mdc-raised-button.mat-warn {
+  background: #facc15;
+  /* yellow-400 */
+  color: #0f172a;
+  /* slate-900 */
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  box-shadow: none;
+  transition: background-color 0.2s;
+}
+
+.ff-confirm-dialog .mat-mdc-dialog-actions .mat-mdc-raised-button.mat-warn:hover {
+  background: #fbbf24;
+  /* yellow-500 */
 }

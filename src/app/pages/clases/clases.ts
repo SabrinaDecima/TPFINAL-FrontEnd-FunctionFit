@@ -5,6 +5,8 @@ import { GymClass } from '../../shared/interfaces/gym-class.interface';
 import { GroupedGymClass, GymClassTurn } from '../../shared/interfaces/grouped-gym-class.interface';
 import { ToastrService } from 'ngx-toastr';
 import { Payment } from '../../shared/interfaces/payment.interface';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmationDialog } from '../../shared/components/confirmation-dialog/confirmation-dialog';
 
 @Component({
   selector: 'app-gym-classes',
@@ -20,6 +22,7 @@ export default class GymClassesComponent implements OnInit {
   // Inyectamos servicios
   private servicesService = inject(ServicesService);
   private toastr = inject(ToastrService);
+  private dialog = inject(MatDialog);
 
   // Estado de pagos
   currentPayment: Payment | null = null;
@@ -51,31 +54,55 @@ export default class GymClassesComponent implements OnInit {
       return;
     }
 
-    try {
-      const res = await this.servicesService.reserveClass(classId);
-      if (res.success) {
-        this.updateTurnoState(classId, true, res.currentEnrollments, res.maxCapacity);
-        this.toastr.success('¡Reserva confirmada!');
-      } else {
-        this.toastr.error(res.message || 'No se pudo reservar', 'Error');
+    const dialogRef = this.dialog.open(ConfirmationDialog, {
+      data: {
+        title: 'Confirmar reserva',
+        message: '¿Estás seguro de que querés reservar esta clase?'
+      },
+      panelClass: 'ff-confirm-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(async (result) => {
+      if (result) {
+        try {
+          const res = await this.servicesService.reserveClass(classId);
+          if (res.success) {
+            this.updateTurnoState(classId, true, res.currentEnrollments, res.maxCapacity);
+            this.toastr.success('¡Reserva confirmada!');
+          } else {
+            this.toastr.error(res.message || 'No se pudo reservar', 'Error');
+          }
+        } catch (err: any) {
+          this.toastr.error(err?.error?.message || 'Error al reservar', 'Error');
+        }
       }
-    } catch (err: any) {
-      this.toastr.error(err?.error?.message || 'Error al reservar', 'Error');
-    }
+    });
   }
 
   async cancel(classId: number) {
-    try {
-      const res = await this.servicesService.cancelReservation(classId);
-      if (res.success) {
-        this.updateTurnoState(classId, false, res.currentEnrollments, res.maxCapacity);
-        this.toastr.info('Reserva cancelada');
-      } else {
-        this.toastr.warning(res.message || 'No se pudo cancelar', 'Atención');
+    const dialogRef = this.dialog.open(ConfirmationDialog, {
+      data: {
+        title: 'Cancelar reserva',
+        message: '¿Estás seguro de que querés cancelar esta clase?'
+      },
+      panelClass: 'ff-confirm-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(async (result) => {
+      if (result) {
+        try {
+          const res = await this.servicesService.cancelReservation(classId);
+          if (res.success) {
+            this.updateTurnoState(classId, false, res.currentEnrollments, res.maxCapacity);
+            this.toastr.info('Reserva cancelada');
+          } else {
+            this.toastr.warning(res.message || 'No se pudo cancelar', 'Atención');
+          }
+        } catch (err: any) {
+          this.toastr.error(err?.error?.message || 'Error al cancelar', 'Error');
+        }
       }
-    } catch (err: any) {
-      this.toastr.error(err?.error?.message || 'Error al cancelar', 'Error');
-    }
+    });
   }
 
   private updateTurnoState(classId: number, isReserved: boolean, currentEnrollments?: number, maxCapacity?: number) {
