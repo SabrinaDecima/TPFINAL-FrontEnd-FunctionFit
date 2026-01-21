@@ -1,0 +1,64 @@
+<div class="bg-zinc-900 p-6 rounded-xl border border-zinc-800 shadow-xl max-w-2xl mx-auto">
+      <h2 class="text-2xl font-bold text-white mb-6">Registrar Nuevo Miembro</h2>
+      
+      <form class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Nombre -->
+          <div>
+            <label class="block text-sm font-medium text-zinc-400 mb-1">Nombre</label>
+            <input formControlName="name" type="text" 
+                   class="w-full bg-zinc-800 border-zinc-700 text-white rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          
+          <!-- Apellido -->
+          <div>
+            <label class="block text-sm font-medium text-zinc-400 mb-1">Apellido</label>
+            <input formControlName="lastName" type="text" 
+                   class="w-full bg-zinc-800 border-zinc-700 text-white rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-zinc-400 mb-1">Correo Electrónico</label>
+          <input formControlName="email" type="email" 
+                 class="w-full bg-zinc-800 border-zinc-700 text-white rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+          @if (userForm.get('email')?.invalid && userForm.get('email')?.touched) {
+            <span class="text-red-500 text-xs">Email no válido</span>
+          }
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Rol -->
+          <div>
+            <label class="block text-sm font-medium text-zinc-400 mb-1">Rol de Acceso</label>
+            <select formControlName="role" 
+                    class="w-full bg-zinc-800 border-zinc-700 text-white rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="member">Miembro</option>
+              <option value="admin">Administrador</option>
+              <option value="superadmin">Super Admin</option>
+            </select>
+          </div>
+
+          <!-- Plan -->
+          <div>
+            <label class="block text-sm font-medium text-zinc-400 mb-1">Plan de Entrenamiento</label>
+            <select formControlName="plan" 
+                    class="w-full bg-zinc-800 border-zinc-700 text-white rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="basic">Plan Básico</option>
+              <option value="premium">Plan Premium</option>
+              <option value="vip">Plan VIP</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-4 flex justify-end gap-3">
+          <button type="button" class="px-4 py-2 text-zinc-400 hover:text-white transition">Cancelar</button>
+          <button type="submit" 
+                  [disabled]="userForm.invalid"
+                  class="btn-primary py-2  disabled:opacity-50 text-white font-semibold rounded-lg transition-all shadow-lg shadow-bg-blue-500/20">
+            Guardar Usuario
+          </button>
+        </div>
+      </form>
+    </div>
