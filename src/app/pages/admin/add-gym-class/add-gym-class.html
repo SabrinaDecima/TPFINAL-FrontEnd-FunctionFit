@@ -1,0 +1,91 @@
+<div class="py-10 px-4 max-w-3xl mx-auto bg-slate-900 min-h-screen">
+    <div class="text-center mb-10">
+        <i class="fas fa-plus-circle text-5xl text-yellow-400 mb-4"></i>
+        <h1 class="text-3xl font-bold text-white">Agregar Nueva Clase</h1>
+        <p class="text-slate-400 mt-2">Completa los datos para crear una nueva clase de gimnasio.</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+
+        <div class="glass-card p-5">
+            <label class="block text-white font-medium mb-2">Nombre de la clase *</label>
+            <input type="text" formControlName="nombre" class="input-field w-full"
+                placeholder="Ej: Musculación, Funcional..." />
+            <div class="mt-1 text-red-400 text-sm" *ngIf="form.controls.nombre.invalid && form.controls.nombre.touched">
+                <span *ngIf="form.controls.nombre.errors?.['required']">Este campo es obligatorio.</span>
+                <span *ngIf="form.controls.nombre.errors?.['minlength']">Mínimo 2 caracteres.</span>
+            </div>
+        </div>
+
+        <div class="glass-card p-5">
+            <label class="block text-white font-medium mb-2">Descripción *</label>
+            <textarea formControlName="descripcion" class="input-field w-full" rows="3"
+                placeholder="Describe la clase..."></textarea>
+            <div class="mt-1 text-red-400 text-sm"
+                *ngIf="form.controls.descripcion.invalid && form.controls.descripcion.touched">
+                <span *ngIf="form.controls.descripcion.errors?.['required']">Este campo es obligatorio.</span>
+            </div>
+        </div>
+
+        <div class="glass-card p-5">
+            <label class="block text-white font-medium mb-2">Capacidad máxima *</label>
+            <input type="number" formControlName="maxCapacity" class="input-field w-full" min="1" max="50" />
+            <div class="mt-1 text-red-400 text-sm"
+                *ngIf="form.controls.maxCapacity.invalid && form.controls.maxCapacity.touched">
+                <span *ngIf="form.controls.maxCapacity.errors?.['required']">Requerido.</span>
+                <span *ngIf="form.controls.maxCapacity.errors?.['min']">Mínimo 1 persona.</span>
+                <span *ngIf="form.controls.maxCapacity.errors?.['max']">Máximo 50 personas.</span>
+            </div>
+        </div>
+
+        <div class="glass-card p-5">
+            <label class="block text-white font-medium mb-2">Duración (minutos) *</label>
+            <input type="number" formControlName="duracionMinutos" class="input-field w-full" min="10" max="180" />
+            <div class="mt-1 text-red-400 text-sm"
+                *ngIf="form.controls.duracionMinutos.invalid && form.controls.duracionMinutos.touched">
+                <span *ngIf="form.controls.duracionMinutos.errors?.['required']">Requerido.</span>
+                <span *ngIf="form.controls.duracionMinutos.errors?.['min']">Mínimo 10 min.</span>
+                <span *ngIf="form.controls.duracionMinutos.errors?.['max']">Máximo 180 min.</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="glass-card p-5">
+                <label class="block text-white font-medium mb-2">Día *</label>
+                <select formControlName="dia" class="input-field w-full">
+                    <option *ngFor="let day of days" [value]="day.value">{{ day.label }}</option>
+                </select>
+            </div>
+
+            <div class="glass-card p-5">
+                <label class="block text-white font-medium mb-2">Hora (HH:mm) *</label>
+                <input type="text" formControlName="hora" class="input-field w-full" placeholder="Ej: 19:00" />
+                <div class="mt-1 text-red-400 text-sm" *ngIf="form.controls.hora.invalid && form.controls.hora.touched">
+                    <span *ngIf="form.controls.hora.errors?.['invalidTime']">Formato inválido (HH:mm).</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card p-5">
+            <label class="block text-white font-medium mb-2">Texto para la imagen *</label>
+            <input type="text" formControlName="imageUrlText" class="input-field w-full"
+                placeholder="Ej: Musculación, Cardio..." />
+            <div class="mt-1 text-red-400 text-sm"
+                *ngIf="form.controls.imageUrlText.invalid && form.controls.imageUrlText.touched">
+                <span *ngIf="form.controls.imageUrlText.errors?.['required']">Requerido.</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">
+                Se generará automáticamente: <code>https://placehold.co/600x400?text=TuTexto&font=montserrat</code>
+            </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-end mt-8">
+            <button type="button" (click)="goToHomeAdmin()" class="btn-secondary px-6 py-2 rounded-lg">
+                Cancelar
+            </button>
+            <button type="submit" [disabled]="form.invalid" class="btn-primary px-6 py-2 rounded-lg">
+                Crear Clase
+            </button>
+        </div>
+    </form>
+</div>
