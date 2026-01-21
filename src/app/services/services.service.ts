@@ -6,6 +6,7 @@ import { GymClass } from '../shared/interfaces/gym-class.interface';
 import { EnrollmentResponse } from '../shared/interfaces/enrollment-response.interface';
 import { Historical } from '../shared/interfaces/historical.interface';
 import { Payment} from '../shared/interfaces/payment.interface';
+import { CreateGymClassRequest } from '../shared/interfaces/create-gym-class-request.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -180,6 +181,21 @@ async getPendingPayment(): Promise<Payment[]> {
       body: JSON.stringify(request)
     });
     return res.json();
+  }
+
+  async createGymClass(request: CreateGymClassRequest): Promise<GymClass> {
+    const token = this.getAuthToken();
+    if (!token) throw new Error('No autenticado');
+
+    const url = `${this.API_URL}/api/GymClass`;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    });
+
+    return firstValueFrom(
+      this.http.post<GymClass>(url, request, { headers })
+    );
   }
 }
 
