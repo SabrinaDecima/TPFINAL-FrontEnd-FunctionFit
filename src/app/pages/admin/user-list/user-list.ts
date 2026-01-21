@@ -3,10 +3,11 @@ import { UserService } from '../../../services/user.service';
 import { PLAN_CONFIG } from '../../../shared/interfaces/user.interface';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
+import { UserForm } from "../user-form/user-form";
 
 @Component({
   selector: 'app-user-list',
-  imports: [FormsModule, DatePipe, CommonModule],
+  imports: [FormsModule, DatePipe, CommonModule, UserForm],
   templateUrl: './user-list.html',
   styleUrl: './user-list.scss',
 })
@@ -45,4 +46,6 @@ export default class UserList {
     // Cargar usuarios al iniciar el componente
     this.userService.loadUsers();
   }
+
+  showForm = signal(false);
 }
