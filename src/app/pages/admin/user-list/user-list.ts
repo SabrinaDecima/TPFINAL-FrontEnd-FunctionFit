@@ -1,9 +1,12 @@
 import { Component, computed, inject, signal, effect } from '@angular/core';
-import { UserService } from '../../../services/user.service';
+import { AdminUserService } from '../../../services/adminUser.service';
 import { PLAN_CONFIG } from '../../../shared/interfaces/user.interface';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
 import { UserForm } from "../user-form/user-form";
+import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmationDialog } from '../../../shared/components/confirmation-dialog/confirmation-dialog';
 
 @Component({
   selector: 'app-user-list',
@@ -12,14 +15,34 @@ import { UserForm } from "../user-form/user-form";
   styleUrl: './user-list.scss',
 })
 export default class UserList {
-  private userService = inject(UserService);
+  private adminUserService = inject(AdminUserService);
+  private toastr = inject(ToastrService);
+  private dialog = inject(MatDialog);
 
   searchTerm = signal('');
-  users = this.userService.users;
 
-
-
+  users = signal<any[]>([]);
   planConfig = PLAN_CONFIG;
+
+  showForm = signal(false);
+  selectedUser: any = null;
+
+  showConfirmDialog = false;
+pendingDeleteId: number | null = null;
+
+
+  constructor() {
+    this.loadUsers();
+  }
+
+  async loadUsers() {
+    try {
+      const allUsers = await this.adminUserService.getAllUsers();
+      this.users.set(allUsers);
+    } catch (err: any) {
+      this.toastr.error(err, 'Error al cargar usuarios');
+    }
+  }
 
   filteredUsers = computed(() => {
     const term = this.searchTerm().toLowerCase();
@@ -33,19 +56,47 @@ export default class UserList {
       (u.email?.toLowerCase() ?? '').includes(term) ||
       (u.apellido?.toLowerCase() ?? '').includes(term)
     );
-
-
   });
+
+
 
   updateSearch(event: Event) {
     const input = event.target as HTMLInputElement;
     this.searchTerm.set(input.value);
   }
 
-  constructor() {
-    // Cargar usuarios al iniciar el componente
-    this.userService.loadUsers();
+
+  editUser(user: any) {
+    this.selectedUser = user;
+    this.showForm.set(true);
   }
 
-  showForm = signal(false);
+  confirmDelete(id: number) {
+  this.pendingDeleteId = id;
+  this.showConfirmDialog = true;
 }
+
+cancelDelete() {
+  this.showConfirmDialog = false;
+  this.pendingDeleteId = null;
+}
+
+async deleteUser(id: number | null) {
+  if (!id) return;
+  try {
+    const res = await this.adminUserService.deleteUser(id);
+    this.toastr.success(res.message);
+    await this.loadUsers();
+  } catch (err: any) {
+    this.toastr.error(err, 'Error al eliminar usuario');
+  } finally {
+    this.showConfirmDialog = false;
+    this.pendingDeleteId = null;
+  }
+}
+
+}
+
+
+
+

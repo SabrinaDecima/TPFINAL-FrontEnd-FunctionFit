@@ -65,11 +65,25 @@ body {
 }
 
 
+.transparent-backdrop {
+  background: transparent !important;   // elimina el overlay negro
+}
+
+
 // Estilo personalizado para modales de FunctionFit (versión clara)
 .ff-confirm-dialog .mat-mdc-dialog-container {
-  background: transparent;
-  padding: 0;
+   background: transparent;
+   padding: 0;
+  
+
 }
+
+.cdk-overlay-backdrop.transparent-backdrop {
+  background: transparent !important;
+}
+
+
+
 
 .ff-confirm-dialog .mat-mdc-dialog-surface {
   background-color: #ffffff;
@@ -143,3 +157,21 @@ body {
   background: #fbbf24;
   /* yellow-500 */
 }
+
+// .ff-confirm-dialog .mat-mdc-dialog-container .mdc-dialog__surface {
+//   background-color: transparent !important;
+//   --mdc-dialog-container-color: transparent !important;
+//   box-shadow: none !important;
+// }
+
+
+
+.cdk-overlay-backdrop.transparent-backdrop {
+  background: transparent !important;
+  position: fixed !important;
+}
+
+body.dialog-open {
+  filter: blur(5px);
+}
+
