@@ -12,9 +12,11 @@ import { RouterModule, Router } from '@angular/router';
   imports: [CommonModule, RouterModule],
 })
 export default class Pagos {
+
   private servicesService = inject(ServicesService);
   private router = inject(Router);
 
+  // Estado
   currentPayment = signal<Payment | null>(null);
   paymentHistory = signal<Payment[]>([]);
   loading = signal<boolean>(true);
@@ -25,21 +27,32 @@ export default class Pagos {
 
   async loadPayments() {
     this.loading.set(true);
-    try {
-      
-      const pending = await this.servicesService.getPendingPayment();
-      this.currentPayment.set(pending.length ? this.mapToPayment(pending[0]) : null);
 
-      
+    try {
+      // 🔹 Pago pendiente (OBJETO o null)
+      const pending = await this.servicesService.getPendingPayment();
+      console.log('PENDING FROM API 👉', pending);
+
+      this.currentPayment.set(
+        pending ? this.mapToPayment(pending) : null
+      );
+
+      // 🔹 Historial (ARRAY)
       const history = await this.servicesService.getPaymentHistory();
-      this.paymentHistory.set(history.map(p => this.mapToPayment(p)));
+      this.paymentHistory.set(
+        history.map(p => this.mapToPayment(p))
+      );
+
     } catch (err) {
       console.error('Error al cargar pagos:', err);
+      this.currentPayment.set(null);
+      this.paymentHistory.set([]);
     } finally {
       this.loading.set(false);
     }
   }
 
+  // Mapper seguro
   mapToPayment(p: any): Payment {
     return {
       Id: p.Id,
@@ -51,6 +64,7 @@ export default class Pagos {
     };
   }
 
+  // Iniciar pago
   async pay() {
     if (!this.currentPayment()) return;
 
@@ -59,7 +73,7 @@ export default class Pagos {
         Monto: this.currentPayment()!.Monto
       });
 
-      
+      // Redirección a Mercado Pago
       window.location.href = res.Url;
 
     } catch (err) {
@@ -67,14 +81,18 @@ export default class Pagos {
     }
   }
 
-  
+  // Utilidad: saber si hay deuda
   hasPendingPayment(): boolean {
-    return this.currentPayment() !== null && !this.currentPayment()?.Pagado;
+    return !!this.currentPayment() && !this.currentPayment()!.Pagado;
   }
 
+  // Formateo de fecha
   formatDate(fecha?: string) {
     if (!fecha) return '';
     const d = new Date(fecha);
-    return d.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+    return d.toLocaleDateString('es-AR', {
+      month: 'long',
+      year: 'numeric'
+    });
   }
 }

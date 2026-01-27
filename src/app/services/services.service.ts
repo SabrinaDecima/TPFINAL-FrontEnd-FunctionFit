@@ -163,25 +163,57 @@ export class ServicesService {
   }
 
 async getPendingPayment(): Promise<Payment[]> {
-    const res = await fetch('/api/payment/user/1/payments/pending'); 
-    return res.json(); 
-  }
+  const token = this.getAuthToken();
+  if (!token) throw new Error('No autenticado');
+
+  const url = `${this.API_URL}/api/payment/me/payments/pending`;
+
+  const headers = new HttpHeaders({
+    Authorization: `Bearer ${token}`
+  });
+
+  return await firstValueFrom(
+    this.http.get<Payment[]>(url, { headers })
+  );
+}
 
   
-  async getPaymentHistory(): Promise<Payment[]> {
-    const res = await fetch('/api/payment/user/1'); 
-    return res.json();
-  }
+async getPaymentHistory(): Promise<Payment[]> {
+  const token = this.getAuthToken();
+  if (!token) throw new Error('No autenticado');
+
+  const headers = new HttpHeaders({
+    Authorization: `Bearer ${token}`
+  });
+
+  const url = `${this.API_URL}/api/payment/me`;
+
+  return await firstValueFrom(
+    this.http.get<Payment[]>(url, { headers })
+  );
+}
+
+
 
   
-  async createMercadoPagoPayment(request: { Monto: number }): Promise<{ Url: string }> {
-    const res = await fetch('/api/payment/mercadopago', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(request)
-    });
-    return res.json();
-  }
+async createMercadoPagoPayment(request: { Monto: number }): Promise<{ Url: string }> {
+  const token = this.getAuthToken();
+  if (!token) throw new Error('No autenticado');
+
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`
+  });
+
+  return await firstValueFrom(
+    this.http.post<{ Url: string }>(
+      `${this.API_URL}/api/payment/mercadopago`,
+      request,
+      { headers }
+    )
+  );
+}
+
 
   async createGymClass(request: CreateGymClassRequest): Promise<GymClass> {
     const token = this.getAuthToken();
