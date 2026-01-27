@@ -1,4 +1,4 @@
-import { Component, inject,  Input,  OnInit } from '@angular/core';
+import { Component, EventEmitter, HostListener, inject,  Input,  OnInit, Output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminUserService, CreateUserByAdminRequest } from '../../../services/adminUser.service';
 import { ToastrService } from 'ngx-toastr';
@@ -14,8 +14,16 @@ export class UserForm implements OnInit {
   private adminUserService = inject(AdminUserService);
   private toastr = inject(ToastrService);
 
-  // chequear si esta bien usar el tipo any
-  @Input() userToEdit?: any;
+  
+  @Input() userToEdit: any = null;
+  @Output() onClose = new EventEmitter<void>();
+
+  // para que cierre con ESC
+  @HostListener('document:keydown.escape')
+  handleEscape() {
+    this.onClose.emit();
+  }
+
 
   userForm = this.fb.group({
     nombre: ['', [Validators.required]],
@@ -40,16 +48,29 @@ export class UserForm implements OnInit {
       }
       this.userForm.get('planId')?.updateValueAndValidity();
     });
+
+   
   }
 
 
   ngOnInit(): void {
+
      if (this.userToEdit) {
-      this.userForm.patchValue(this.userToEdit);
-      // limpiamos para que no pida el campo de contraseña al editar
-      this.userForm.get('contraseña')?.clearValidators();
-      this.userForm.get('contraseña')?.updateValueAndValidity();
-    }
+    // Si el backend devuelve role como objeto, extraemos el id
+
+    console.log('Editando usuario:', this.userToEdit);
+    const patchData = {
+      ...this.userToEdit,
+      roleId: this.userToEdit.roleId || this.userToEdit.role?.id || ''
+    };
+
+    this.userForm.patchValue(patchData);
+
+    // al editar no pedimos contraseña obligatoria
+    this.userForm.get('contraseña')?.clearValidators();
+    this.userForm.get('contraseña')?.updateValueAndValidity();
+  }
+
   }
 
 
@@ -63,15 +84,16 @@ export class UserForm implements OnInit {
 
     try {
      if (this.userToEdit) {
-   
+        //  Lógica de actualización
         const response = await this.adminUserService.updateUser(this.userToEdit.id, payload);
         this.toastr.success(response.message || 'Usuario actualizado correctamente');
       } else {
-        // 👇 Lógica de creación
+        //  Lógica de creación
         const response = await this.adminUserService.createUser(payload);
         this.toastr.success(response.message || 'Usuario creado correctamente');
       }
       this.userForm.reset();   // limpiar formulario
+      this.onClose.emit();     // cerrar formulario
 
     } catch (error:any) {
       this.toastr.error(error, 'Error'); // mostrar error del backend

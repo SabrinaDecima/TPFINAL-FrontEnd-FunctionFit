@@ -26,10 +26,12 @@ export default class UserList {
 
   showForm = signal(false);
   selectedUser: any = null;
-
+  
   showConfirmDialog = false;
-pendingDeleteId: number | null = null;
-
+  pendingDeleteId: number | null = null;
+  
+  
+  
 
   constructor() {
     this.loadUsers();
