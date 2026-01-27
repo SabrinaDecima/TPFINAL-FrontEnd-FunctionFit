@@ -41,9 +41,9 @@
         <label class="block text-sm font-medium text-zinc-400 mb-1">Rol de Acceso</label>
         <select formControlName="roleId"
           class="w-full bg-zinc-800 border-zinc-700 text-white rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-          <option value="1">Socio</option>
-          <option value="2">Administrador</option>
-          <option value="3">Super Admin</option>
+          <option [value]="1">Socio</option>
+          <option [value]="2">Administrador</option>
+          <option [value]="3">Super Admin</option>
         </select>
       </div>
 
@@ -67,7 +67,8 @@
     </div>
 
     <div class="pt-4 flex justify-end gap-3">
-      <button type="button" class="px-4 py-2 text-zinc-400 hover:text-white transition">Cancelar</button>
+      <button type="button" (click)="onClose.emit()"
+        class="px-4 py-2 text-zinc-400 hover:text-white transition">Cancelar</button>
       <button type="submit" [disabled]="userForm.invalid"
         class="btn-primary py-2  disabled:opacity-50 text-white font-semibold rounded-lg transition-all shadow-lg shadow-bg-blue-500/20">
         Guardar Usuario

@@ -21,7 +21,7 @@
       </button>
 
       <!-- Componente del Formulario -->
-      <app-user-form (onClose)="showForm.set(false)" />
+      <app-user-form [userToEdit]="selectedUser" (onClose)="showForm.set(false)"; loadUsers() />
     </div>
   </div>
   }
