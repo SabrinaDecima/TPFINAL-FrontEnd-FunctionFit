@@ -14,8 +14,8 @@ export default class HomeAdmin {
 
   cardData = [
     {
-      title: 'Gestionar Clases',
-      text: 'Crear, editar o eliminar clases disponibles en el gimnasio.',
+      title: 'Agregar Clases',
+      text: 'Crear clases disponibles en el gimnasio.',
       buttonName: 'Ir a Clases',
       pathname: '/admin/clases/nueva',
       icon: 'fas fa-dumbbell'
@@ -27,5 +27,12 @@ export default class HomeAdmin {
       pathname: '/admin/user-list',
       icon: 'fas fa-users'
     },
+    {
+      title: 'Gestionar Planes',
+      text: 'Crear, editar o eliminar tipos de planes disponibles.',
+      buttonName: 'Ir a Planes',
+      pathname: '/admin/planes',
+      icon: 'fas fa-file-invoice-dollar'
+    }
   ];
 }

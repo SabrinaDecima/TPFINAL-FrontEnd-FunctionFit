@@ -1,0 +1,35 @@
+import { inject, Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment.development';
+
+export interface Plan {
+  id: number;
+  tipo: number;
+  precio: number;
+}
+
+@Injectable({ providedIn: 'root' })
+export class PlanService {
+  private http = inject(HttpClient);
+  private API_URL = environment.apiUrl 
+
+    private getHeaders() {
+    const token = localStorage.getItem('authToken');
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+  }
+
+  getAllPlans(): Observable<Plan[]> {
+    return this.http.get<Plan[]>(`${this.API_URL}/plan`, { headers: this.getHeaders() });
+  }
+
+  getPlanById(id: number): Observable<Plan> {
+    return this.http.get<Plan>(`${this.API_URL}/plan/${id}`, { headers: this.getHeaders() });
+  }
+
+  updatePlan(id: number, payload: Partial<Plan>): Observable<any> {
+    return this.http.put(`${this.API_URL}/plan/${id}`, payload, { headers: this.getHeaders() });
+  }
+}
