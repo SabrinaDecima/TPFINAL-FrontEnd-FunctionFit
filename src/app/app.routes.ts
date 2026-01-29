@@ -89,6 +89,12 @@ export const routes: Routes = [
                 path: 'admin/clases/nueva',
                 loadComponent: () => import('./pages/admin/add-gym-class/add-gym-class'),
                 canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
+            },
+            { 
+                path: 'admin/planes',
+                loadComponent: () => import('./pages/admin/plan-management/plan-management')
+                .then(m => m.PlanManagement),
+                canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
             }
         ]
     },

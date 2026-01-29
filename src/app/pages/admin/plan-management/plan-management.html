@@ -1,0 +1,65 @@
+<div class="glass-card p-6">
+  <h2 class="text-xl font-bold mb-4">Plan Management</h2>
+
+  <!-- Tabla de planes -->
+  <table class="w-full text-left border-collapse">
+    <thead class="bg-slate-800 text-white">
+      <tr>
+        <th class="p-3">ID</th>
+        <th class="p-3">Tipo</th>
+        <th class="p-3">Precio</th>
+        <th class="p-3 text-right">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (plan of plans(); track plan.id) {
+        <tr class="hover:bg-slate-800/30 transition-colors">
+          <td class="p-3">{{ plan.id }}</td>
+          <td class="p-3">{{ plan.tipo }}</td>
+          <td class="p-3">{{ plan.precio | currency:'USD' }}</td>
+          <td class="p-3 text-right">
+            <button (click)="editPlan(plan.id)"
+                    class="text-blue-400 hover:text-blue-200 transition">
+              Editar
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  @if (selectedPlan()) {
+  <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="glass-card p-6 max-w-md w-full">
+      <h3 class="text-lg font-bold mb-4">Editar Plan</h3>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-zinc-400 mb-1">Tipo</label>
+          <input [(ngModel)]="selectedPlan()!.tipo" class="input-field w-full" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-zinc-400 mb-1">Precio</label>
+          <input [(ngModel)]="selectedPlan()!.precio" type="number" class="input-field w-full" />
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-6">
+        <button (click)="selectedPlan.set(null)"
+                class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+          Cancelar
+        </button>
+        <button (click)="savePlan()"
+                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+}
+ 
+  
+</div>
+
+
