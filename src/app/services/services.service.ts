@@ -196,7 +196,10 @@ async getPaymentHistory(): Promise<Payment[]> {
 
 
   
-async createMercadoPagoPayment(request: { Monto: number }): Promise<{ Url: string }> {
+async createMercadoPagoPayment(
+  request: { Monto: number }
+): Promise<{ initPoint: string }> {
+
   const token = this.getAuthToken();
   if (!token) throw new Error('No autenticado');
 
@@ -206,7 +209,7 @@ async createMercadoPagoPayment(request: { Monto: number }): Promise<{ Url: strin
   });
 
   return await firstValueFrom(
-    this.http.post<{ Url: string }>(
+    this.http.post<{ initPoint: string }>(
       `${this.API_URL}/api/payment/mercadopago`,
       request,
       { headers }
