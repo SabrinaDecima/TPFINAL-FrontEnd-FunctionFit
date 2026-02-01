@@ -86,6 +86,11 @@ export const routes: Routes = [
                 canActivate: [roleGuard('Socio')]
             },
             {
+                path: 'admin/clases',
+                loadComponent: () => import('./pages/admin/gym-class-management/gym-class-management'),
+                canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
+            },
+            {
                 path: 'admin/clases/nueva',
                 loadComponent: () => import('./pages/admin/add-gym-class/add-gym-class'),
                 canActivate: [roleGuard('Administrador', 'SuperAdministrador')]

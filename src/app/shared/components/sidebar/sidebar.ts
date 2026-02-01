@@ -30,6 +30,7 @@ export class Sidebar {
 
     if (user.role === 'Administrador' || user.role === 'SuperAdministrador') {
       items.push({ label: 'Usuarios', route: '/admin/user-list', icon: 'fa-users' });
+      items.push({ label: 'Clases', route: '/admin/clases', icon: 'fa-dumbbell' });
       items.push({ label: 'Agregar Clase', route: '/admin/clases/nueva', icon: 'fa-plus-circle' });
       items.push({ label: 'Gestionar Planes', route: '/admin/planes', icon: 'fa-file-invoice-dollar' });
     }
