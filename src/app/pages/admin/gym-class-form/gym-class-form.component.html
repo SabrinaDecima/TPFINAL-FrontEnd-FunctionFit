@@ -1,0 +1,94 @@
+<div class="glass-card p-6">
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold">{{ isEditMode ? 'Editar Clase' : 'Nueva Clase' }}</h2>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Nombre -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Nombre</label>
+        <input type="text" formControlName="nombre" class="input-field w-full"
+          placeholder="Ej: Yoga Mañana">
+        @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
+        <p class="text-red-400 text-xs mt-1">El nombre es requerido (mínimo 2 caracteres)</p>
+        }
+      </div>
+
+      <!-- Duración -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Duración (minutos)</label>
+        <input type="number" formControlName="duracionMinutos" class="input-field w-full"
+          min="10" max="180">
+        @if (form.get('duracionMinutos')?.invalid && form.get('duracionMinutos')?.touched) {
+        <p class="text-red-400 text-xs mt-1">Duración entre 10 y 180 minutos</p>
+        }
+      </div>
+    </div>
+
+    <!-- Descripción -->
+    <div>
+      <label class="block text-sm font-medium mb-1">Descripción</label>
+      <textarea formControlName="descripcion" class="input-field w-full h-24"
+        placeholder="Describe la clase..."></textarea>
+      @if (form.get('descripcion')?.invalid && form.get('descripcion')?.touched) {
+      <p class="text-red-400 text-xs mt-1">La descripción es requerida</p>
+      }
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Imagen URL Text -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Icono/Imagen (texto)</label>
+        <input type="text" formControlName="imageUrl" class="input-field w-full"
+          placeholder="Ej: 🧘">
+      </div>
+
+      <!-- Capacidad Máxima -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Capacidad Máxima</label>
+        <input type="number" formControlName="maxCapacity" class="input-field w-full"
+          min="1" max="50">
+        @if (form.get('maxCapacity')?.invalid && form.get('maxCapacity')?.touched) {
+        <p class="text-red-400 text-xs mt-1">Capacidad entre 1 y 50</p>
+        }
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Día -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Día de la Semana</label>
+        <select formControlName="dia" class="input-field w-full">
+          @for (day of days; track day.value) {
+          <option [value]="day.value">{{ day.label }}</option>
+          }
+        </select>
+        @if (form.get('dia')?.invalid && form.get('dia')?.touched) {
+        <p class="text-red-400 text-xs mt-1">El día es requerido</p>
+        }
+      </div>
+
+      <!-- Hora -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Hora</label>
+        <input type="time" formControlName="hora" class="input-field w-full">
+        @if (form.get('hora')?.invalid && form.get('hora')?.touched) {
+        <p class="text-red-400 text-xs mt-1">Ingresa una hora válida (HH:MM)</p>
+        }
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="flex justify-end gap-3 pt-6 border-t border-slate-700">
+      <button type="button" (click)="close()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg"
+        [disabled]="isLoading">
+        Cancelar
+      </button>
+      <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white"
+        [disabled]="isLoading || form.invalid">
+        {{ isLoading ? 'Guardando...' : (isEditMode ? 'Actualizar' : 'Crear') }}
+      </button>
+    </div>
+  </form>
+</div>
