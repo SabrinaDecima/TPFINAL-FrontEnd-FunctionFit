@@ -96,14 +96,14 @@ async loadPayments() {
 formatDate(fecha?: string) {
   if (!fecha) return '';
 
-  const [_, month, year] = fecha.split('-');
+  const [_ ,day, month, year] = fecha.split('-');
 
   const meses = [
     'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
     'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
   ];
 
-  return `${meses[Number(month) - 1]} ${year}`;
+  return `${_} ${day} de ${meses[Number(month) - 1]} ${year}`;
 }
 
 
