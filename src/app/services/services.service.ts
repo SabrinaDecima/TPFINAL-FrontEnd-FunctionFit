@@ -232,5 +232,15 @@ async createMercadoPagoPayment(
       this.http.post<GymClass>(url, request, { headers })
     );
   }
+
+  // Notificar al backend sobre un pago de MercadoPago (se usa también para pruebas y redirects)
+async notifyMercadoPago(paymentId: string): Promise<void> {
+  if (!paymentId) throw new Error('paymentId es requerido');
+
+  const url = `${this.API_URL}/api/payment/mercadopago/webhook`;
+  const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+  await firstValueFrom(this.http.post(url, { id: paymentId }, { headers }));
+}
 }
 
