@@ -2,30 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-
-export interface CreateUserByAdminRequest {
-  nombre: string;
-  apellido: string;
-  telefono: string;
-  email: string;
-  contraseña: string;
-  planId?: number | null;
-  roleId: number;
-}
-
-export interface ApiResponse {
-  message: string;
-}
-
-export interface UpdateUserByAdminRequest {
-  nombre: string;
-  apellido: string;
-  telefono?: string;
-  email: string;
-  contraseña?: string;      
-  planId?: number | null;
-  roleId: number;
-}
+import { ApiResponse, CreateUserByAdminRequest, UpdateUserByAdminRequest } from '../shared/interfaces';
 
 @Injectable({ providedIn: 'root' })
 export class AdminUserService {

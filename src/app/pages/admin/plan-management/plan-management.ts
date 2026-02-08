@@ -1,7 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PlanService, Plan } from '../../../services/plan.service';
+import { PlanService } from '../../../services/plan.service';
 import { CurrencyPipe } from '@angular/common';
+import { Plan } from '../../../shared/interfaces';
 
 @Component({
   selector: 'app-plan-management',

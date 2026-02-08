@@ -1,9 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
 import { ServicesService } from '../../services/services.service';
-import { Payment } from '../../shared/interfaces/payment.interface';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Payment } from '../../shared/interfaces';
 
 @Component({
   selector: 'app-pagos',

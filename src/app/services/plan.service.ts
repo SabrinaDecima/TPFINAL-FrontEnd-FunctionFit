@@ -2,12 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment.development';
-
-export interface Plan {
-  id: number;
-  tipo: number;
-  precio: number;
-}
+import { Plan } from '../shared/interfaces';
 
 @Injectable({ providedIn: 'root' })
 export class PlanService {

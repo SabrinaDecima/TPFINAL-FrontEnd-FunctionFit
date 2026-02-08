@@ -1,12 +1,12 @@
 import { Component, computed, inject, signal, effect } from '@angular/core';
 import { AdminUserService } from '../../../services/adminUser.service';
-import { PLAN_CONFIG } from '../../../shared/interfaces/user.interface';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
 import { UserForm } from "../user-form/user-form";
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialog } from '../../../shared/components/confirmation-dialog/confirmation-dialog';
+import { PLAN_CONFIG } from '../../../shared/interfaces';
 
 @Component({
   selector: 'app-user-list',
