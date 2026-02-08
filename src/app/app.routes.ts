@@ -19,13 +19,17 @@ const redirectIfLoggedIn = () => {
     const servicesService = inject(ServicesService);
     const router = inject(Router);
     if (servicesService.isAuthenticated()) {
-        router.navigate(['/']);
+        router.navigate(['/role-home']);
         return false;
     }
     return true;
 };
 
 export const routes: Routes = [
+    {
+        path: '',
+        loadComponent: () => import('./pages/home/home').then(m => m.Home),
+    },
     {
         path: 'login',
         loadComponent: () => import('./pages/login/login'),
@@ -47,7 +51,7 @@ export const routes: Routes = [
         loadComponent: () => import('./shared/components/layout/layout'),
         children: [
             {
-                path: '',
+                path: 'role-home',
                 loadComponent: () => import('./pages/role-home-redirect/role-home-redirect')
             },
             {
