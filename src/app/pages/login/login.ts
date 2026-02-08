@@ -43,7 +43,7 @@ export default class Login {
     this.isSubmitting.set(false);
 
     if (success) {
-      this.router.navigate(['/']);
+      this.router.navigate(['/role-home']);
     } else {
       alert('Credenciales inválidas.\n\nUsuarios de prueba:\n• cliente@demo.com\n• admin@demo.com\n• superadmin@demo.com\nContraseña: 1234');
     }
