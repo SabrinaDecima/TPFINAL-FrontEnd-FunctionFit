@@ -3,8 +3,8 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ServicesService } from '../../../services/services.service';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { CreateGymClassRequest } from '../../../shared/interfaces/create-gym-class-request.interface';
 import { CommonModule } from '@angular/common';
+import { CreateGymClassRequest } from '../../../shared/interfaces';
 
 
 @Component({

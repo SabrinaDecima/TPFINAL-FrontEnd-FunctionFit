@@ -6,6 +6,10 @@
   </div>
 
   <!-- PAGO ACTUAL -->
+
+  <div *ngIf="checkingPayment()" class="text-center text-slate-500">
+    Comprobando estado de pago con MercadoPago... ⏳
+  </div>
   <div *ngIf="!loading() && currentPayment()"
        class="rounded-2xl p-6 shadow-lg"
        [ngClass]="currentPayment()?.Pagado ? 'bg-green-500 text-white' : 'bg-yellow-400 text-slate-900'">
@@ -24,6 +28,14 @@
             class="mt-4 bg-slate-900 text-yellow-400 px-6 py-2 rounded-xl font-semibold hover:bg-slate-800 transition">
       Pagar ahora
     </button>
+
+    <div *ngIf="!currentPayment()?.Pagado" class="mt-4 space-y-2">
+      <p class="text-sm text-slate-700">Si ya fuiste redirigido por MercadoPago y no se actualizó el estado, podés pegar el <code>payment_id</code> aquí:</p>
+      <div class="flex items-center gap-2">
+        <input [(ngModel)]="verificationId" placeholder="Payment ID de MercadoPago" class="px-3 py-2 rounded border w-full" />
+        <button (click)="verifyPaymentWithId()" class="px-4 py-2 bg-slate-700 text-white rounded">Verificar</button>
+      </div>
+    </div>
 
     <p *ngIf="currentPayment()?.Pagado" class="mt-2">
       ¡Membresía activa! Ya podés reservar clases.

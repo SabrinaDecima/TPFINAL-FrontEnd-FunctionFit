@@ -3,8 +3,8 @@ import { GymClassService } from '../../../services/gym-class.service';
 import { ToastrService } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { GymClass } from '../../../shared/interfaces/gym-class.interface';
 import { GymClassFormComponent } from '../gym-class-form/gym-class-form.component';
+import { GymClass } from '../../../shared/interfaces';
 
 @Component({
   selector: 'app-gym-class-management',

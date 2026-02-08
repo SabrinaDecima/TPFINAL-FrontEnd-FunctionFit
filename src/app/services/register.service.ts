@@ -2,28 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-
-export interface RegisterRequest {
-  name: string;
-  lastName: string;
-  phoneNumber: string;
-  email: string;
-  password: string;
-  plan: string;
-}
-
-interface RegisterApiRequest {
-  Nombre: string;
-  Apellido: string;
-  Telefono: string;
-  Email: string;
-  Contraseña: string;
-  PlanId: number;
-}
-
-export interface RegisterResponse {
-  message: string;
-}
+import { RegisterApiRequest, RegisterRequest, RegisterResponse } from '../shared/interfaces';
 
 @Injectable({
   providedIn: 'root'

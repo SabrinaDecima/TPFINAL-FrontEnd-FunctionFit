@@ -1,12 +1,8 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { User } from '../shared/interfaces/user.interface';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { GymClass } from '../shared/interfaces/gym-class.interface';
-import { EnrollmentResponse } from '../shared/interfaces/enrollment-response.interface';
-import { Historical } from '../shared/interfaces/historical.interface';
-import { Payment} from '../shared/interfaces/payment.interface';
-import { CreateGymClassRequest } from '../shared/interfaces/create-gym-class-request.interface';
+import { CreateGymClassRequest, EnrollmentResponse, GymClass, Historical, Payment, User } from '../shared/interfaces';
+
 
 @Injectable({
   providedIn: 'root'
@@ -232,5 +228,15 @@ async createMercadoPagoPayment(
       this.http.post<GymClass>(url, request, { headers })
     );
   }
+
+  // Notificar al backend sobre un pago de MercadoPago (se usa también para pruebas y redirects)
+async notifyMercadoPago(paymentId: string): Promise<void> {
+  if (!paymentId) throw new Error('paymentId es requerido');
+
+  const url = `${this.API_URL}/api/payment/mercadopago/webhook`;
+  const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+  await firstValueFrom(this.http.post(url, { id: paymentId }, { headers }));
+}
 }
 
