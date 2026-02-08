@@ -28,7 +28,8 @@ const redirectIfLoggedIn = () => {
 export const routes: Routes = [
     {
         path: '',
-        loadComponent: () => import('./pages/home/home').then(m => m.Home),
+        loadComponent: () => import('./pages/home/home'),
+        canActivate: [redirectIfLoggedIn]
     },
     {
         path: 'login',
@@ -43,6 +44,11 @@ export const routes: Routes = [
     {
         path: 'reset-password',
         loadComponent: () => import('./pages/reset-password/reset-password'),
+        canActivate: [redirectIfLoggedIn]
+    },
+    {
+        path: 'register',
+        loadComponent: () => import('./pages/register/register'),
         canActivate: [redirectIfLoggedIn]
     },
     {
@@ -95,22 +101,12 @@ export const routes: Routes = [
                 canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
             },
             {
-                path: 'admin/clases/nueva',
-                loadComponent: () => import('./pages/admin/add-gym-class/add-gym-class'),
-                canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
-            },
-            { 
                 path: 'admin/planes',
                 loadComponent: () => import('./pages/admin/plan-management/plan-management')
-                .then(m => m.PlanManagement),
+                    .then(m => m.PlanManagement),
                 canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
             }
         ]
-    },
-    {
-        path: 'register',
-        loadComponent: () => import('./pages/register/register'),
-        canActivate: [redirectIfLoggedIn]
     },
     { path: '**', redirectTo: '' }
 ];
