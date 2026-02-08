@@ -1,0 +1,169 @@
+<div class="flex flex-col min-h-screen bg-gym-dark text-white font-sans">
+
+    <header class="border-b border-gray-800 shadow-sm bg-gym-dark sticky top-0 z-50">
+        <div class="container mx-auto flex items-center justify-between py-4 px-6">
+            <span class="text-2xl font-bold text-yellow-500">FunctionFit()</span>
+            <div class="flex items-center gap-4">
+                <a routerLink="/login"
+                    class="text-white border border-yellow-500 hover:bg-yellow-500 hover:text-black px-4 py-2 rounded-md transition-colors">
+                    Iniciar Sesión
+                </a>
+                <a routerLink="/register"
+                    class="bg-yellow-500 text-black font-bold px-4 py-2 rounded-md hover:bg-yellow-600 transition-colors">
+                    Registrarse
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        <section class="py-20 px-6">
+            <div class="container mx-auto flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2 text-center md:text-left">
+                    <h1 class="text-5xl md:text-6xl font-extrabold mb-6 text-yellow-500 leading-tight">
+                        Transforma tu cuerpo, transforma tu vida
+                    </h1>
+                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+                        Únete a <span class="font-bold">FunctionFit()</span> y comienza tu viaje hacia un estilo de vida
+                        saludable con
+                        nuestros entrenadores expertos y equipamiento de última generación.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                        <a routerLink="/register"
+                            class="bg-yellow-500 text-black px-8 py-4 rounded-lg font-bold text-lg hover:bg-yellow-600 transition-transform hover:scale-105 text-center">
+                            Comenzar Ahora
+                        </a>
+                        <a href="#plans"
+                            class="border border-yellow-500 text-yellow-500 px-8 py-4 rounded-lg font-bold text-lg hover:bg-yellow-500 hover:text-black transition-all text-center">
+                            Ver Planes
+                        </a>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <img src="logo-gym-transparent.png" alt="Hero"
+                        class="max-h-[400px] drop-shadow-[0_0_25px_rgba(234,179,8,0.3)]">
+                </div>
+            </div>
+        </section>
+
+        <section id="plans" class="py-20 bg-gym-dark">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center text-yellow-500 mb-16 uppercase tracking-wider">Nuestros
+                    Planes</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    @for (plan of prices(); track plan.title) {
+                    <div class="relative flex flex-col h-full">
+                        @if (plan.highlighted) {
+                        <div class="bg-yellow-500 text-black text-center font-bold py-1 uppercase text-sm rounded-t-xl">
+                            Más vendido
+                        </div>
+                        }
+                        <div [ngClass]="{
+                'bg-white text-black ring-4 ring-yellow-500': plan.highlighted,
+                'bg-gym-dark text-white border border-gray-700': !plan.highlighted
+              }" class="p-8 rounded-b-xl flex-grow shadow-2xl transition-transform hover:-translate-y-2">
+                            <h3 class="text-2xl font-bold text-yellow-600 mb-4">{{ plan.title }}</h3>
+                            <div class="text-4xl font-black mb-1">${{ plan.price }}</div>
+                            <p class="text-gray-500 text-sm mb-6">por mes</p>
+
+                            <ul class="space-y-4 mb-8">
+                                @for (feature of plan.features; track feature) {
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    {{ feature }}
+                                </li>
+                                }
+                            </ul>
+
+                            <a [routerLink]="['/registro']" [queryParams]="{ plan: plan.title }"
+                                class="block text-center py-3 rounded-lg font-bold transition-colors"
+                                [ngClass]="plan.highlighted ? 'bg-black text-white hover:bg-gray-800' : 'bg-yellow-500 text-black hover:bg-yellow-600'">
+                                Elegir Plan
+                            </a>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-slate-50 py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center text-yellow-500 mb-16 uppercase tracking-tight">
+                    Por qué elegirnos
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    @for (feature of features(); track feature.title) {
+                    <div
+                        class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-center border border-slate-100 flex flex-col items-center h-full group">
+
+                        <div
+                            class="mb-6 bg-yellow-100 p-5 rounded-full w-20 h-20 flex items-center justify-center group-hover:bg-yellow-200 transition-colors">
+
+                            @if (feature.icon === 'users') {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                fill="none" stroke="#ca8a04" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            }
+
+                            @else if (feature.icon === 'dumbbell') {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                fill="none" stroke="#ca8a04" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M6 15H4a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2h2"></path>
+                                <path d="M18 15h2a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-2"></path>
+                                <line x1="6" y1="12" x2="18" y2="12"></line>
+                                <rect x="6" y="7" width="2" height="10"></rect>
+                                <rect x="16" y="7" width="2" height="10"></rect>
+                            </svg>
+                            }
+
+                            @else {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                fill="none" stroke="#ca8a04" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            }
+                        </div>
+
+                        <h3 class="text-xl font-bold mb-4 text-slate-800">
+                            {{ feature.title }}
+                        </h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            {{ feature.description }}
+                        </p>
+                    </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+
+    <footer class="border-t border-gray-800 py-8 bg-gym-dark">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-400">
+            <span class="text-yellow-500 font-bold text-xl">FunctionFit()</span>
+            <p class="text-sm">© 2026 FunctionFit(). Todos los derechos reservados.</p>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-yellow-500 transition-colors">Términos</a>
+                <a href="#" class="hover:text-yellow-500 transition-colors">Privacidad</a>
+            </div>
+        </div>
+    </footer>
+</div>

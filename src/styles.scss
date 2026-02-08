@@ -33,6 +33,11 @@ body {
 
 @import "tailwindcss";
 
+@theme {
+  
+  --color-gym-dark: #212529;
+}
+
 :root {
   color-scheme: dark;
 }
