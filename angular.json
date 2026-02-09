@@ -66,6 +66,11 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "headers": {
+              "Content-Security-Policy": ""
+            }
+          },
           "configurations": {
             "production": {
               "buildTarget": "TPFINAL-FrontEnd-FunctionFit:build:production"

@@ -82,7 +82,7 @@ async loadPayments() {
     });
 
     // 🚀 Redirección PRO
-    window.location.href = res.initPoint;
+    window.open(res.initPoint, '_blank');
 
   } catch (err) {
     console.error('Error al iniciar pago:', err);

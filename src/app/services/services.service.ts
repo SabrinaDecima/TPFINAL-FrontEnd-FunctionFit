@@ -233,6 +233,21 @@ async createMercadoPagoPayment(
     );
   }
 
+  // Obtener la public key de MercadoPago
+  async getMercadoPagoPublicKey(): Promise<string> {
+    try {
+      const response = await firstValueFrom(
+        this.http.get<{ publicKey: string }>(
+          `${this.API_URL}/api/payment/mercadopago/publickey`
+        )
+      );
+      return response.publicKey;
+    } catch (err) {
+      console.error('Error obteniendo MercadoPago Public Key:', err);
+      return '';
+    }
+  }
+
   // Notificar al backend sobre un pago de MercadoPago (se usa también para pruebas y redirects)
 async notifyMercadoPago(paymentId: string): Promise<void> {
   if (!paymentId) throw new Error('paymentId es requerido');
