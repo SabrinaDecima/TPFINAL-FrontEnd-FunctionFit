@@ -14,10 +14,10 @@ export default class HomeAdmin {
 
   cardData = [
     {
-      title: 'Agregar Clases',
-      text: 'Crear clases disponibles en el gimnasio.',
+      title: 'Administrar Clases',
+      text: 'Administrar clases disponibles en el gimnasio.',
       buttonName: 'Ir a Clases',
-      pathname: '/admin/clases/nueva',
+      pathname: '/admin/clases',
       icon: 'fas fa-dumbbell'
     },
     {

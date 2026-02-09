@@ -1,7 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PlanService, Plan } from '../../../services/plan.service';
+import { PlanService } from '../../../services/plan.service';
 import { CurrencyPipe } from '@angular/common';
+import { Plan } from '../../../shared/interfaces';
 
 @Component({
   selector: 'app-plan-management',
@@ -10,7 +11,7 @@ import { CurrencyPipe } from '@angular/common';
   templateUrl: './plan-management.html',
   styleUrl: './plan-management.scss',
 })
-export class PlanManagement {
+export default class PlanManagement {
   private planService = inject(PlanService);
 
   plans = signal<Plan[]>([]);

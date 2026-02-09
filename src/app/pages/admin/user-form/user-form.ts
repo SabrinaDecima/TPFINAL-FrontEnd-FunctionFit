@@ -1,7 +1,8 @@
 import { Component, EventEmitter, HostListener, inject,  Input,  OnInit, Output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AdminUserService, CreateUserByAdminRequest } from '../../../services/adminUser.service';
 import { ToastrService } from 'ngx-toastr';
+import { AdminUserService } from '../../../services/adminUser.service';
+import { CreateUserByAdminRequest } from '../../../shared/interfaces';
 
 @Component({
   selector: 'app-user-form',

@@ -2,17 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment.development';
-import { GymClass } from '../shared/interfaces/gym-class.interface';
-
-export interface CreateGymClassRequest {
-  nombre: string;
-  descripcion: string;
-  duracionMinutos: number;
-  imageUrl: string;
-  dia: number;
-  hora: string;
-  maxCapacity: number;
-}
+import { CreateGymClassRequest, GymClass } from '../shared/interfaces';
 
 @Injectable({ providedIn: 'root' })
 export class GymClassService {

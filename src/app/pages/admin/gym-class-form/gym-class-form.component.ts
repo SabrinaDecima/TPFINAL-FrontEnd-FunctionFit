@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GymClassService } from '../../../services/gym-class.service';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
-import { GymClass } from '../../../shared/interfaces/gym-class.interface';
+import { GymClass } from '../../../shared/interfaces';
 
 @Component({
   selector: 'app-gym-class-form',

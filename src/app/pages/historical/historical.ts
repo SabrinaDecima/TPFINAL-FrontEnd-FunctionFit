@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ServicesService } from '../../services/services.service';
-import { Historical } from '../../shared/interfaces/historical.interface';
+import { Historical } from '../../shared/interfaces';
 
 @Component({
   selector: 'app-historical',

@@ -1,12 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ServicesService } from '../../services/services.service';
 import { CommonModule } from '@angular/common';
-import { GymClass } from '../../shared/interfaces/gym-class.interface';
-import { GroupedGymClass, GymClassTurn } from '../../shared/interfaces/grouped-gym-class.interface';
 import { ToastrService } from 'ngx-toastr';
-import { Payment } from '../../shared/interfaces/payment.interface';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialog } from '../../shared/components/confirmation-dialog/confirmation-dialog';
+import { GroupedGymClass, GymClass, GymClassTurn, Payment } from '../../shared/interfaces';
 
 @Component({
   selector: 'app-gym-classes',

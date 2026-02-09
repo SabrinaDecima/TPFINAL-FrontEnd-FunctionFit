@@ -19,13 +19,18 @@ const redirectIfLoggedIn = () => {
     const servicesService = inject(ServicesService);
     const router = inject(Router);
     if (servicesService.isAuthenticated()) {
-        router.navigate(['/']);
+        router.navigate(['/role-home']);
         return false;
     }
     return true;
 };
 
 export const routes: Routes = [
+    {
+        path: '',
+        loadComponent: () => import('./pages/home/home'),
+        canActivate: [redirectIfLoggedIn]
+    },
     {
         path: 'login',
         loadComponent: () => import('./pages/login/login'),
@@ -42,12 +47,17 @@ export const routes: Routes = [
         canActivate: [redirectIfLoggedIn]
     },
     {
+        path: 'register',
+        loadComponent: () => import('./pages/register/register'),
+        canActivate: [redirectIfLoggedIn]
+    },
+    {
         path: '',
         canActivate: [authGuard],
         loadComponent: () => import('./shared/components/layout/layout'),
         children: [
             {
-                path: '',
+                path: 'role-home',
                 loadComponent: () => import('./pages/role-home-redirect/role-home-redirect')
             },
             {
@@ -78,7 +88,7 @@ export const routes: Routes = [
             {
                 path: 'admin/user-list',
                 loadComponent: () => import('./pages/admin/user-list/user-list'),
-                canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
+                canActivate: [roleGuard('Administrador')]
             },
             {
                 path: 'pagos',
@@ -88,25 +98,14 @@ export const routes: Routes = [
             {
                 path: 'admin/clases',
                 loadComponent: () => import('./pages/admin/gym-class-management/gym-class-management'),
-                canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
+                canActivate: [roleGuard('Administrador')]
             },
             {
-                path: 'admin/clases/nueva',
-                loadComponent: () => import('./pages/admin/add-gym-class/add-gym-class'),
-                canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
-            },
-            { 
                 path: 'admin/planes',
-                loadComponent: () => import('./pages/admin/plan-management/plan-management')
-                .then(m => m.PlanManagement),
-                canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
+                loadComponent: () => import('./pages/admin/plan-management/plan-management'),
+                canActivate: [roleGuard('Administrador')]
             }
         ]
-    },
-    {
-        path: 'register',
-        loadComponent: () => import('./pages/register/register'),
-        canActivate: [redirectIfLoggedIn]
     },
     { path: '**', redirectTo: '' }
 ];

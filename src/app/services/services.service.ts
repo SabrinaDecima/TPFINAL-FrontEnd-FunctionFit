@@ -1,12 +1,8 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { User } from '../shared/interfaces/user.interface';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { GymClass } from '../shared/interfaces/gym-class.interface';
-import { EnrollmentResponse } from '../shared/interfaces/enrollment-response.interface';
-import { Historical } from '../shared/interfaces/historical.interface';
-import { Payment} from '../shared/interfaces/payment.interface';
-import { CreateGymClassRequest } from '../shared/interfaces/create-gym-class-request.interface';
+import { CreateGymClassRequest, EnrollmentResponse, GymClass, Historical, Payment, User } from '../shared/interfaces';
+
 
 @Injectable({
   providedIn: 'root'

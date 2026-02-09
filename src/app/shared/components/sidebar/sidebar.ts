@@ -28,15 +28,16 @@ export class Sidebar {
       );
     }
 
-    if (user.role === 'Administrador' || user.role === 'SuperAdministrador') {
+    if (user.role === 'Administrador') {
       items.push({ label: 'Usuarios', route: '/admin/user-list', icon: 'fa-users' });
       items.push({ label: 'Clases', route: '/admin/clases', icon: 'fa-dumbbell' });
-      items.push({ label: 'Agregar Clase', route: '/admin/clases/nueva', icon: 'fa-plus-circle' });
       items.push({ label: 'Gestionar Planes', route: '/admin/planes', icon: 'fa-file-invoice-dollar' });
     }
 
     if (user.role === 'SuperAdministrador') {
-      items.push({ label: 'Page-3', route: '/page-3', icon: 'fa-cog' });
+      items.push(
+        { label: 'Dashboard', route: '/home-super-admin', icon: 'fa-chart-line' },
+      );
     }
 
     return items;

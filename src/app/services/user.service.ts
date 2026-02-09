@@ -1,8 +1,8 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { User } from '../shared/interfaces/user.interface';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { firstValueFrom } from 'rxjs';
+import { User } from '../shared/interfaces';
 
 @Injectable({
   providedIn: 'root',
