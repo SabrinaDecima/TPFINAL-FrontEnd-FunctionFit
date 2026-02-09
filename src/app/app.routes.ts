@@ -88,7 +88,7 @@ export const routes: Routes = [
             {
                 path: 'admin/user-list',
                 loadComponent: () => import('./pages/admin/user-list/user-list'),
-                canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
+                canActivate: [roleGuard('Administrador')]
             },
             {
                 path: 'pagos',
@@ -98,13 +98,12 @@ export const routes: Routes = [
             {
                 path: 'admin/clases',
                 loadComponent: () => import('./pages/admin/gym-class-management/gym-class-management'),
-                canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
+                canActivate: [roleGuard('Administrador')]
             },
             {
                 path: 'admin/planes',
-                loadComponent: () => import('./pages/admin/plan-management/plan-management')
-                    .then(m => m.PlanManagement),
-                canActivate: [roleGuard('Administrador', 'SuperAdministrador')]
+                loadComponent: () => import('./pages/admin/plan-management/plan-management'),
+                canActivate: [roleGuard('Administrador')]
             }
         ]
     },

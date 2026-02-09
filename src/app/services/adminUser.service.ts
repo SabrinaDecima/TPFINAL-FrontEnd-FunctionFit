@@ -56,4 +56,12 @@ export class AdminUserService {
     }
   }
 
+  async getActivitySummary(): Promise<any> {
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return firstValueFrom(
+      this.http.get(`${this.API_URL}/activity-summary`, { headers })
+    );
+  }
+
 }

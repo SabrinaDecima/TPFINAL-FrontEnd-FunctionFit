@@ -11,7 +11,7 @@ import { Plan } from '../../../shared/interfaces';
   templateUrl: './plan-management.html',
   styleUrl: './plan-management.scss',
 })
-export class PlanManagement {
+export default class PlanManagement {
   private planService = inject(PlanService);
 
   plans = signal<Plan[]>([]);
