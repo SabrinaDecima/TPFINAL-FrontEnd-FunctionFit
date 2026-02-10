@@ -104,6 +104,11 @@ export const routes: Routes = [
                 path: 'admin/planes',
                 loadComponent: () => import('./pages/admin/plan-management/plan-management'),
                 canActivate: [roleGuard('Administrador')]
+            },
+            {
+                path: 'admin/pagos',
+                loadComponent: () => import('./pages/admin/payment-management/payment-management'),
+                canActivate: [roleGuard('Administrador')]
             }
         ]
     },
