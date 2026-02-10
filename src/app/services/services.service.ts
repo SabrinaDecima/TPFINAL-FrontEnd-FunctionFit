@@ -12,6 +12,11 @@ export class ServicesService {
   private http = inject(HttpClient);
 
   _currentUser = signal<User | null>(null);
+
+  // Helper to expose current user safely
+  getCurrentUser(): User | null {
+    return this._currentUser();
+  }
   private _isAuthenticated = signal(false);
 
   constructor() {
@@ -89,6 +94,13 @@ export class ServicesService {
 
   getAuthToken(): string | null {
     return localStorage.getItem('authToken');
+  }
+
+  getAuthHeaders(): HttpHeaders {
+    const token = this.getAuthToken();
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
   }
 
   async getGymClasses(): Promise<GymClass[]> {
@@ -192,27 +204,40 @@ async getPaymentHistory(): Promise<Payment[]> {
 
 
   
-async createMercadoPagoPayment(
-  request: { Monto: number }
-): Promise<{ initPoint: string }> {
+  async createMercadoPagoPayment(
+    request: { Monto: number; Email?: string }
+  ): Promise<{ initPoint: string; preferenceId: string }> {
+    const token = this.getAuthToken();
+    if (!token) throw new Error('No autenticado');
 
-  const token = this.getAuthToken();
-  if (!token) throw new Error('No autenticado');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    });
 
-  const headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`
-  });
+    return await firstValueFrom(
+      this.http.post<{ initPoint: string; preferenceId: string }>(
+        `${this.API_URL}/api/payment/mercadopago`,
+        request,
+        { headers }
+      )
+    );
+  }
 
-  return await firstValueFrom(
-    this.http.post<{ initPoint: string }>(
-      `${this.API_URL}/api/payment/mercadopago`,
-      request,
-      { headers }
-    )
-  );
-}
+  async notifyMercadoPago(paymentId: string): Promise<void> {
+    if (!paymentId) throw new Error('paymentId es requerido');
 
+    const url = `${this.API_URL}/api/payment/mercadopago/webhook`;
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    await firstValueFrom(this.http.post(url, { id: paymentId }, { headers }));
+  }
+
+  async verifyPaymentStatus(): Promise<void> {
+    const url = `${this.API_URL}/api/payment/mercadopago/verify`;
+    const headers = this.getAuthHeaders();
+    await firstValueFrom(this.http.post(url, {}, { headers }));
+  }
 
   async createGymClass(request: CreateGymClassRequest): Promise<GymClass> {
     const token = this.getAuthToken();
@@ -228,30 +253,4 @@ async createMercadoPagoPayment(
       this.http.post<GymClass>(url, request, { headers })
     );
   }
-
-  // Obtener la public key de MercadoPago
-  async getMercadoPagoPublicKey(): Promise<string> {
-    try {
-      const response = await firstValueFrom(
-        this.http.get<{ publicKey: string }>(
-          `${this.API_URL}/api/payment/mercadopago/publickey`
-        )
-      );
-      return response.publicKey;
-    } catch (err) {
-      console.error('Error obteniendo MercadoPago Public Key:', err);
-      return '';
-    }
-  }
-
-  // Notificar al backend sobre un pago de MercadoPago (se usa también para pruebas y redirects)
-async notifyMercadoPago(paymentId: string): Promise<void> {
-  if (!paymentId) throw new Error('paymentId es requerido');
-
-  const url = `${this.API_URL}/api/payment/mercadopago/webhook`;
-  const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-
-  await firstValueFrom(this.http.post(url, { id: paymentId }, { headers }));
 }
-}
-

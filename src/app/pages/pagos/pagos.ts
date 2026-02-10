@@ -25,36 +25,34 @@ export default class Pagos {
 
   constructor() {
     this.loadPayments();
-    this.checkForMercadoPagoRedirect();
+    this.checkForMercadoPagoReturn();
   }
 
-async loadPayments() {
-  this.loading.set(true);
+  async loadPayments() {
+    this.loading.set(true);
 
-  try {
-    const history = await this.servicesService.getPaymentHistory();
-    const mapped = history.map(p => this.mapToPayment(p));
+    try {
+      const history = await this.servicesService.getPaymentHistory();
+      const mapped = history.map(p => this.mapToPayment(p));
 
-    // 🔴 pago impago más reciente
-    const pending = mapped
-      .filter(p => !p.Pagado)
-      .sort((a, b) => new Date(b.Fecha).getTime() - new Date(a.Fecha).getTime())[0];
+      // Pago pendiente más reciente
+      const pending = mapped
+        .filter(p => !p.Pagado)
+        .sort((a, b) => new Date(b.Fecha).getTime() - new Date(a.Fecha).getTime())[0];
 
-    this.currentPayment.set(pending ?? null);
+      this.currentPayment.set(pending ?? null);
 
-    // 🟢 historial SIN el pago actual
-    this.paymentHistory.set(
-      mapped.filter(p => p !== pending)
-    );
+      // Historial sin el pago actual
+      this.paymentHistory.set(mapped.filter(p => p !== pending));
 
-  } catch (err) {
-    console.error('Error al cargar pagos:', err);
-    this.currentPayment.set(null);
-    this.paymentHistory.set([]);
-  } finally {
-    this.loading.set(false);
+    } catch (err) {
+      console.error('Error al cargar pagos:', err);
+      this.currentPayment.set(null);
+      this.paymentHistory.set([]);
+    } finally {
+      this.loading.set(false);
+    }
   }
-}
 
 
 
@@ -70,83 +68,92 @@ async loadPayments() {
   };
 }
 
-
-  // Iniciar pago
   async pay() {
-  const payment = this.currentPayment();
-  if (!payment) return;
+    const payment = this.currentPayment();
+    if (!payment) return;
 
-  try {
-    const res = await this.servicesService.createMercadoPagoPayment({
-      Monto: payment.Monto
-    });
-
-    // 🚀 Redirección PRO
-    window.open(res.initPoint, '_blank');
-
-  } catch (err) {
-    console.error('Error al iniciar pago:', err);
-  }
-}
-
-  // Detectar retorno de Mercado Pago y notificar al backend
-  private async checkForMercadoPagoRedirect() {
     try {
-      const params = new URLSearchParams(window.location.search);
-      const paymentId = params.get('payment_id') || params.get('collection_id') || params.get('id') || params.get('collection_id_from_callback') || params.get('preference_id');
+      const user = this.servicesService.getCurrentUser();
+      const res = await this.servicesService.createMercadoPagoPayment({
+        Monto: payment.Monto,
+        Email: user?.email
+      });
 
-      if (paymentId) {
-        this.checkingPayment.set(true);
-        // Llamamos al webhook local para que reconcilie el pago con Mercado Pago
-        await this.servicesService.notifyMercadoPago(paymentId);
+      if (!res || !res.initPoint) {
+        alert('Error al iniciar pago');
+        return;
+      }
 
-        // Quitamos params de la URL para evitar re-procesarlo si recargas
-        if (window.history && window.history.replaceState) {
-          const url = window.location.origin + window.location.pathname;
-          window.history.replaceState({}, document.title, url);
-        }
+      // Guardar el preferenceId o algo para verificar después si falla el redirect
+      localStorage.setItem('last_payment_pref', res.preferenceId);
 
-        // Recargamos pagos
-        await this.loadPayments();
-        this.checkingPayment.set(false);
+      // Redirigir a Mercado Pago en una nueva pestaña
+      window.open(res.initPoint, '_blank');
+
+    } catch (err) {
+      console.error('Error al iniciar pago:', err);
+      alert('Error al iniciar pago. Revisa la consola.');
+    }
+  }
+
+  async verifyLastPayment() {
+    this.checkingPayment.set(true);
+    try {
+      // Llamamos al backend para que busque activamente el pago en MP
+      await this.servicesService.verifyPaymentStatus();
+      
+      // Recargamos la lista local
+      await this.loadPayments();
+      
+      const current = this.currentPayment();
+      if (current?.Pagado) {
+        alert('¡Pago verificado con éxito!');
+      } else {
+        alert('El pago aún figura como pendiente. Si ya pagaste, espera unos instantes y vuelve a intentar.');
       }
     } catch (err) {
-      console.error('Error comprobando redirección de MercadoPago:', err);
-    }
-  }
-
-
-  // Utilidad: saber si hay deuda
-  hasPendingPayment(): boolean {
-    return !!this.currentPayment() && !this.currentPayment()!.Pagado;
-  }
-
-  // Verificación manual si el usuario tiene el payment_id de MercadoPago
-  verificationId = signal<string>('');
-
-  async verifyPaymentWithId() {
-    const id = this.verificationId();
-    if (!id) return;
-
-    try {
-      this.checkingPayment.set(true);
-      await this.servicesService.notifyMercadoPago(id);
-      await this.loadPayments();
-    } catch (err) {
-      console.error('Error verificando pago:', err);
+      console.error('Error verificando:', err);
+      alert('Error al verificar el pago.');
     } finally {
       this.checkingPayment.set(false);
-      this.verificationId.set('');
     }
   }
 
-  // Formateo de fecha: "HH:MM DD de <mes> de AAAA"
+  private async checkForMercadoPagoReturn() {
+    const params = new URLSearchParams(window.location.search);
+    const paymentId = params.get('payment_id') || params.get('collection_id');
+
+    console.log('Verificando retorno de MP. URL completa:', window.location.href);
+    console.log('Payment ID encontrado:', paymentId);
+
+    if (paymentId) {
+      this.checkingPayment.set(true);
+      
+      try {
+        console.log('Notificando pago al backend:', paymentId);
+        // Notificar al backend sobre el pago
+        await this.servicesService.notifyMercadoPago(paymentId);
+        console.log('Pago notificado exitosamente');
+        
+        // Limpiar URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Recargar pagos
+        await this.loadPayments();
+      } catch (err) {
+        console.error('Error verificando pago:', err);
+      } finally {
+        this.checkingPayment.set(false);
+      }
+    }
+  }
+
+  // Formateo de fecha
   formatDate(fecha?: string) {
     if (!fecha) return '';
 
     let date = new Date(fecha);
 
-    // Intentar soportar formatos comunes como DD-MM-YYYY o "DD-MM-YYYY HH:MM"
     if (isNaN(date.getTime())) {
       const [datePart, timePart] = fecha.split(' ');
       const [d, m, y] = (datePart || '').split('-');
@@ -172,6 +179,4 @@ async loadPayments() {
 
     return `${hours}:${minutes} ${day} de ${monthName} de ${year}`;
   }
-
-
 }
