@@ -5,7 +5,7 @@
   </div>
 
   <div *ngIf="checkingPayment()" class="text-center text-slate-500">
-    Comprobando estado de pago con MercadoPago... ⏳
+    Verificando estado de pago con MercadoPago... ⏳
   </div>
 
   <div
@@ -22,37 +22,25 @@
     <p class="text-lg">
       {{ formatDate(currentPayment()?.Fecha) }} ·
       <span class="font-bold">
-        {{ currentPayment()?.Pagado ? 'Pagado' : 'Impago' }}
+        {{ currentPayment()?.Pagado ? 'Pagado' : 'Pendiente' }}
       </span>
     </p>
 
     <button
       *ngIf="!currentPayment()?.Pagado"
       (click)="pay()"
-      class="mt-4 bg-slate-900 text-yellow-400 px-6 py-2 rounded-xl font-semibold hover:bg-slate-800 transition"
+      class="mt-4 bg-slate-900 text-yellow-400 px-6 py-2 rounded-xl font-semibold hover:bg-slate-800 transition mr-2"
     >
       Pagar ahora
     </button>
 
-    <div *ngIf="!currentPayment()?.Pagado" class="mt-4 space-y-2">
-      <p class="text-sm text-slate-700">
-        Si ya pagaste y no se actualizó, pegá el <code>payment_id</code>:
-      </p>
-
-      <div class="flex gap-2">
-        <input
-          [(ngModel)]="verificationId"
-          placeholder="Payment ID"
-          class="px-3 py-2 rounded border w-full"
-        />
-        <button
-          (click)="verifyPaymentWithId()"
-          class="px-4 py-2 bg-slate-700 text-white rounded"
-        >
-          Verificar
-        </button>
-      </div>
-    </div>
+    <button
+      *ngIf="!currentPayment()?.Pagado"
+      (click)="verifyLastPayment()"
+      class="mt-4 bg-white/20 text-slate-900 px-6 py-2 rounded-xl font-semibold hover:bg-white/30 transition border border-slate-900/10"
+    >
+      Ya pagué (Verificar)
+    </button>
 
     <p *ngIf="currentPayment()?.Pagado" class="mt-2">
       ¡Membresía activa! 💪
@@ -77,7 +65,7 @@
           <b>Estado:</b>
           <span [class.text-green-500]="pago.Pagado"
                 [class.text-red-500]="!pago.Pagado">
-            {{ pago.Pagado ? 'Pagado' : 'Impago' }}
+            {{ pago.Pagado ? 'Pagado' : 'Pendiente' }}
           </span>
         </p>
       </div>
