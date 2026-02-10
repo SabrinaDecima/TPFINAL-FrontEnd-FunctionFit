@@ -1,0 +1,33 @@
+   <div class="glass-card p-6">
+  <h2 class="text-xl font-bold mb-4">Pagos registrados</h2>
+  
+  <!-- Tabla de pagos -->
+  <table class="w-full text-left border-collapse">
+    <thead class="bg-slate-800 text-white">
+      <tr>
+        <th class="p-3">ID</th>
+        <th class="p-3">Usuario</th>
+        <th class="p-3">Monto</th>
+        <th class="p-3">Fecha</th>
+        <th class="p-3">Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (payment of payments; track payment.id) {
+        <tr class="hover:bg-slate-800/30 transition-colors">
+          <td class="p-3">{{ payment.id }}</td>
+          <td class="p-3">{{ payment.userId }}</td>
+          <td class="p-3">${{ payment.monto }}</td>
+          <td class="p-3">{{ payment.fecha }}</td>
+          <td class="p-3">
+            <span [ngClass]="payment.pagado ? 'text-green-400' : 'text-red-400'">
+              {{ payment.pagado ? 'Pagado' : 'Adeudado' }}
+            </span>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+

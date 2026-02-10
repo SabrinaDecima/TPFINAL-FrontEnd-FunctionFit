@@ -12,7 +12,7 @@ import { Plan } from '../../../shared/interfaces';
   styleUrl: './plan-management.scss',
 })
 export default class PlanManagement {
-  private planService = inject(PlanService);
+  private planService = inject(PlanService); 
 
   plans = signal<Plan[]>([]);
   selectedPlan = signal<Plan | null>(null);

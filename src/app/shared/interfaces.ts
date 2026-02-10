@@ -133,3 +133,12 @@ export interface RegisterApiRequest {
   Contraseña: string;
   PlanId: number;
 }
+
+export interface PaymentResponse {
+  id: number;
+  userId: number;
+  monto: number;
+  fecha: string;
+  pagado: boolean;
+
+}

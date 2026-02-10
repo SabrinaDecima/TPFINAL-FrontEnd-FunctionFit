@@ -33,6 +33,13 @@ export default class HomeAdmin {
       buttonName: 'Ir a Planes',
       pathname: '/admin/planes',
       icon: 'fas fa-file-invoice-dollar'
+    },
+    {
+      title: 'Gestionar Pagos',
+      text: 'Ver los pagos realizados y registrar pagos en efectivo.',
+      buttonName: 'Ir a Pagos',
+      pathname: '/admin/pagos',
+      icon: 'fas fa-credit-card'
     }
   ];
 }
