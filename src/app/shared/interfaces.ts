@@ -138,7 +138,50 @@ export interface PaymentResponse {
   id: number;
   userId: number;
   monto: number;
-  fecha: string;
+  fecha: string;      
   pagado: boolean;
+  
+  // Campos adicionales necesarios para el Admin
+  title?: string;       
+  metodoPago?: string;  
+  externalReference?: string; 
+  planId?: number;      
 
+}
+
+export interface GymClassSummary {
+  id: number;
+  nombre: string;
+  dia: number;
+  hora: string;
+}
+
+export interface UserProfileResponse {
+  id: number;
+  nombre: string;
+  apellido: string;
+  email: string;
+  telefono: string;
+  planId: number;
+  
+  isSubscriptionActive: boolean;
+  subscriptionEndDate: string | null; 
+  planName: string;
+  classLimit: number;
+
+
+  enrolledClassesCount: number;
+  enrolledClasses: GymClassSummary[];
+}
+
+export enum TypePlan {
+  Basic = 1,
+  Premium = 2,
+  Elite = 3
+}
+
+export interface PlanResponse {
+  id: number;
+  tipo: TypePlan;
+  precio: number;
 }

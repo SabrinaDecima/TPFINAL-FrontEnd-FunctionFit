@@ -158,20 +158,20 @@ export class ServicesService {
   return await firstValueFrom(this.http.get<Historical[]>(url, { headers }));
   }
 
-async getPendingPayment(): Promise<Payment[]> {
-  const token = this.getAuthToken();
-  if (!token) throw new Error('No autenticado');
+// async getPendingPayment(): Promise<Payment[]> {
+//   const token = this.getAuthToken();
+//   if (!token) throw new Error('No autenticado');
 
-  const url = `${this.API_URL}/api/payment/me/payments/pending`;
+//   const url = `${this.API_URL}/api/payment/me/payments/pending`;
 
-  const headers = new HttpHeaders({
-    Authorization: `Bearer ${token}`
-  });
+//   const headers = new HttpHeaders({
+//     Authorization: `Bearer ${token}`
+//   });
 
-  return await firstValueFrom(
-    this.http.get<Payment[]>(url, { headers })
-  );
-}
+//   return await firstValueFrom(
+//     this.http.get<Payment[]>(url, { headers })
+//   );
+// }
 
   
 async getPaymentHistory(): Promise<Payment[]> {

@@ -17,10 +17,42 @@ export default class PaymentManagement implements OnInit {
  private paymentService = inject(PaymentService);
   payments: PaymentResponse[] = [];
 
+  // Estado para el cargo manual
+  manualCharge = {
+    userId: 0,
+    planId: 1,
+    monto: 0
+  };
+
   ngOnInit() {
+    this.loadPayments();
+    };
+
+
+    loadPayments() {
     this.paymentService.getPayments().subscribe((res: PaymentResponse[]) => {
       this.payments = res;
     });
   }
 
-}
+
+  onSubmitManual() {
+    if (this.manualCharge.userId <= 0 || this.manualCharge.monto <= 0) {
+      alert('Por favor, completa los datos correctamente');
+      return;
+    }
+
+    
+    this.paymentService.createManualPayment(this.manualCharge).subscribe({
+      next: (res) => {
+        alert('Pago y suscripción cargados con éxito');
+        this.loadPayments(); // Recargar la lista
+        this.manualCharge = { userId: 0, planId: 1, monto: 0 }; // Reset
+      },
+      error: (err) => console.error('Error en cargo manual:', err)
+    });
+  }
+
+  }
+
+

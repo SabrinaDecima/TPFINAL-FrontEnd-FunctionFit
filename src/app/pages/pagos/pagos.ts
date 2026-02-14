@@ -1,177 +1,119 @@
-import { Component, inject, signal } from '@angular/core';
-import { ServicesService } from '../../services/services.service';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { Payment } from '../../shared/interfaces';
+import { ActivatedRoute, Router } from '@angular/router'; // Importar Router
+import { PlanService } from '../../services/plan.service';
+import { PaymentService } from '../../services/payment.service';
+import { AuthService } from '../../services/auth.service';
+import { PlanResponse, TypePlan } from '../../shared/interfaces';
 
 @Component({
   selector: 'app-pagos',
-  templateUrl: './pagos.html',
-  styles: [],
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule],
+  templateUrl: './pagos.html'
 })
-export default class Pagos {
-
-  private servicesService = inject(ServicesService);
+export default class PagosComponent implements OnInit {
+  private planService = inject(PlanService);
+  private paymentService = inject(PaymentService);
+  private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  // Estado
-  currentPayment = signal<Payment | null>(null);
-  paymentHistory = signal<Payment[]>([]);
-  loading = signal<boolean>(true);
-  checkingPayment = signal<boolean>(false);
+  plans = signal<PlanResponse[]>([]);
+  loading = signal(false);
+  typePlan = TypePlan;
+  subscription = signal<any>(null);
 
-  constructor() {
-    this.loadPayments();
-    this.checkForMercadoPagoRedirect();
+  esperandoConfirmacion = signal(false);
+
+  ngOnInit() {
+    this.loadPlans();
+    this.checkPaymentStatus();
+    this.checkCurrentSubscription();
   }
 
-async loadPayments() {
-  this.loading.set(true);
-
-  try {
-    const history = await this.servicesService.getPaymentHistory();
-    const mapped = history.map(p => this.mapToPayment(p));
-
-    // 🔴 pago impago más reciente
-    const pending = mapped
-      .filter(p => !p.Pagado)
-      .sort((a, b) => new Date(b.Fecha).getTime() - new Date(a.Fecha).getTime())[0];
-
-    this.currentPayment.set(pending ?? null);
-
-    // 🟢 historial SIN el pago actual
-    this.paymentHistory.set(
-      mapped.filter(p => p !== pending)
-    );
-
-  } catch (err) {
-    console.error('Error al cargar pagos:', err);
-    this.currentPayment.set(null);
-    this.paymentHistory.set([]);
-  } finally {
-    this.loading.set(false);
-  }
-}
-
-
-
-  // Mapper seguro
- mapToPayment(p: any): Payment {
-  return {
-    Id: p.Id ?? p.id,
-    UserId: p.UserId ?? p.userId,
-    Monto: p.Monto ?? p.monto,
-    Fecha: p.Fecha ?? p.fecha,
-    Pagado: p.Pagado ?? p.pagado,
-    InitPoint: p.InitPoint ?? p.initPoint
-  };
-}
-
-
-  // Iniciar pago
-  async pay() {
-  const payment = this.currentPayment();
-  if (!payment) return;
-
-  try {
-    const res = await this.servicesService.createMercadoPagoPayment({
-      Monto: payment.Monto
-    });
-
-    // 🚀 Redirección PRO
-    window.open(res.initPoint, '_blank');
-
-  } catch (err) {
-    console.error('Error al iniciar pago:', err);
-  }
-}
-
-  // Detectar retorno de Mercado Pago y notificar al backend
-  private async checkForMercadoPagoRedirect() {
+  checkCurrentSubscription() {
     try {
-      const params = new URLSearchParams(window.location.search);
-      const paymentId = params.get('payment_id') || params.get('collection_id') || params.get('id') || params.get('collection_id_from_callback') || params.get('preference_id');
-
-      if (paymentId) {
-        this.checkingPayment.set(true);
-        // Llamamos al webhook local para que reconcilie el pago con Mercado Pago
-        await this.servicesService.notifyMercadoPago(paymentId);
-
-        // Quitamos params de la URL para evitar re-procesarlo si recargas
-        if (window.history && window.history.replaceState) {
-          const url = window.location.origin + window.location.pathname;
-          window.history.replaceState({}, document.title, url);
+      const userId = this.authService.getUserId();
+      
+      // Si no hay ID válido, no hacemos la llamada HTTP
+      if (userId === 0) {
+        this.subscription.set(null);
+        return;
+      }
+      
+      this.paymentService.getActiveSubscription(userId).subscribe({
+        next: (sub) => {
+          console.log('Respuesta del servidor:', sub);
+          // Si la suscripción existe y está activa (o vence en el futuro)
+          if (sub && sub.isActive) {
+            this.subscription.set(sub);
+          }
         }
+      });
+    } catch (error) {
+      console.error('Error al obtener ID del usuario:', error);
+      this.subscription.set(null);
+    }
+  }
 
-        // Recargamos pagos
-        await this.loadPayments();
-        this.checkingPayment.set(false);
+  loadPlans() {
+    this.planService.getAllPlans().subscribe(res => this.plans.set(res));
+  }
+
+  checkPaymentStatus() {
+    // Escuchamos los parámetros de la URL
+    this.route.queryParams.subscribe(params => {
+      const paymentId = params['payment_id'];
+      const status = params['status'];
+
+      // Si el pago fue aprobado y tenemos el ID, confirmamos con el backend
+      if (status === 'approved' && paymentId) {
+        this.confirmarPagoEnServidor(paymentId);
+      } else if (status === 'failure') {
+        alert('El pago fue rechazado. Por favor, intenta nuevamente.');
       }
-    } catch (err) {
-      console.error('Error comprobando redirección de MercadoPago:', err);
-    }
+    });
   }
 
+  confirmarPagoEnServidor(paymentId: string) {
+   
+    if (!paymentId) return alert('Por favor, ingresa el número de operación');
 
-  // Utilidad: saber si hay deuda
-  hasPendingPayment(): boolean {
-    return !!this.currentPayment() && !this.currentPayment()!.Pagado;
-  }
-
-  // Verificación manual si el usuario tiene el payment_id de MercadoPago
-  verificationId = signal<string>('');
-
-  async verifyPaymentWithId() {
-    const id = this.verificationId();
-    if (!id) return;
-
-    try {
-      this.checkingPayment.set(true);
-      await this.servicesService.notifyMercadoPago(id);
-      await this.loadPayments();
-    } catch (err) {
-      console.error('Error verificando pago:', err);
-    } finally {
-      this.checkingPayment.set(false);
-      this.verificationId.set('');
-    }
-  }
-
-  // Formateo de fecha: "HH:MM DD de <mes> de AAAA"
-  formatDate(fecha?: string) {
-    if (!fecha) return '';
-
-    let date = new Date(fecha);
-
-    // Intentar soportar formatos comunes como DD-MM-YYYY o "DD-MM-YYYY HH:MM"
-    if (isNaN(date.getTime())) {
-      const [datePart, timePart] = fecha.split(' ');
-      const [d, m, y] = (datePart || '').split('-');
-      if (y && m && d) {
-        date = new Date(`${y}-${m}-${d}${timePart ? 'T' + timePart : ''}`);
+    this.loading.set(true);
+    this.paymentService.confirmarPago(paymentId).subscribe({
+      next: (res) => {
+        this.loading.set(false);
+        this.esperandoConfirmacion.set(false); // Ocultamos el cuadro
+        this.checkCurrentSubscription(); // Refrescar el estado de la suscripción
+        alert('¡Pago confirmado exitosamente!');
+        this.router.navigate(['/home-socio']);
+      },
+      error: (err) => {
+        this.loading.set(false);
+        alert('No se pudo validar el pago. Verifica el número e intenta de nuevo.');
       }
-    }
-
-    if (isNaN(date.getTime())) return '';
-
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const hours = pad(date.getHours());
-    const minutes = pad(date.getMinutes());
-    const day = pad(date.getDate());
-    const year = date.getFullYear();
-
-    const meses = [
-      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
-    ];
-
-    const monthName = meses[date.getMonth()];
-
-    return `${hours}:${minutes} ${day} de ${monthName} de ${year}`;
+    });
   }
 
+  buyPlan(planId: number) {
+    this.loading.set(true);
+    this.paymentService.createPreference(planId).subscribe({
+      next: (res) => {
+        this.loading.set(false);
+        window.open(res.initPoint, '_blank');
+        this.esperandoConfirmacion.set(true); 
+      },
+      error: () => this.loading.set(false)
+    });
+  }
 
+  getPlanDetails(tipo: TypePlan) {
+    const details = {
+      [TypePlan.Basic]: { icon: '🚀', desc: '5 clases mensuales' },
+      [TypePlan.Premium]: { icon: '⭐', desc: '10 clases mensuales' },
+      [TypePlan.Elite]: { icon: '👑', desc: 'Clases ilimitadas' }
+    };
+    return details[tipo];
+  }
 }

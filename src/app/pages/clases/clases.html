@@ -1,9 +1,9 @@
 <div class="p-6 max-w-[95vw] mx-auto">
 
-  <!-- Aviso pago pendiente -->
-  <div *ngIf="currentPayment && !currentPayment.Pagado"
+  <!-- Aviso suscripción no activa -->
+  <div *ngIf="!hasActiveSubscription"
        class="mb-6 p-4 bg-yellow-200 text-yellow-800 rounded-lg text-center font-semibold">
-    Tenés un pago pendiente. No podés reservar clases hasta regularizar tu cuota.
+    No tenés una suscripción activa. No podés reservar clases hasta pagar un plan.
   </div>
 
   <!-- Encabezado -->

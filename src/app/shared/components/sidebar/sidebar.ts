@@ -22,6 +22,7 @@ export class Sidebar {
 
     if (user.role === 'Socio') {
       items.push(
+        { label: 'Mi Suscripción', route: '/mi-suscripcion', icon: 'fa-solid fa-id-card' },
         { label: 'Clases Disponibles', route: '/clases', icon: 'fa-dumbbell' },
         { label: 'Historial', route: '/historial', icon: 'fa-history' },
         { label: 'Pagos', route: '/pagos', icon: 'fa fa-credit-card' }
