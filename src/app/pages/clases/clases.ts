@@ -1,10 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ServicesService } from '../../services/services.service';
+import { PaymentService } from '../../services/payment.service';
+import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialog } from '../../shared/components/confirmation-dialog/confirmation-dialog';
-import { GroupedGymClass, GymClass, GymClassTurn, Payment } from '../../shared/interfaces';
+import { GroupedGymClass, GymClass, GymClassTurn } from '../../shared/interfaces';
 
 @Component({
   selector: 'app-gym-classes',
@@ -19,31 +21,44 @@ export default class GymClassesComponent implements OnInit {
 
   // Inyectamos servicios
   private servicesService = inject(ServicesService);
+  private paymentService = inject(PaymentService);
+  private authService = inject(AuthService);
   private toastr = inject(ToastrService);
   private dialog = inject(MatDialog);
 
-  // Estado de pagos
-  currentPayment: Payment | null = null;
+  // Estado de suscripción
+  hasActiveSubscription = false;
 
   ngOnInit(): void {
     this.loadPayments(); // cargamos pagos primero
     this.loadClasses();
   }
 
-  // Cargamos pagos pendientes del usuario
+  // Cargamos y validamos la suscripción activa del usuario
   async loadPayments() {
     try {
-      const pending = await this.servicesService.getPendingPayment();
-      this.currentPayment = pending.length ? pending[0] : null;
+      const userId = this.authService.getUserId();
+      if (userId === 0) {
+        this.toastr.warning('No hay sesión activa', 'Aviso');
+        this.hasActiveSubscription = false;
+        return;
+      }
+
+      const subscription = await this.paymentService.getActiveSubscription(userId).toPromise();
+      this.hasActiveSubscription = subscription && subscription.isActive;
+
+      if (!this.hasActiveSubscription) {
+        this.toastr.info('No tenés una suscripción activa. Para acceder a las clases, debes pagar un plan.', 'Suscripción requerida');
+      }
     } catch (err) {
-      console.error('Error al cargar pagos:', err);
-      this.currentPayment = null;
+      console.error('Error al verificar suscripción:', err);
+      this.hasActiveSubscription = false;
     }
   }
 
-  // Bloqueo de reserva si hay pagos impagos
+  // Bloqueo de reserva si no hay suscripción activa
   canReserve(): boolean {
-    return !this.currentPayment || this.currentPayment.Pagado;
+    return this.hasActiveSubscription;
   }
 
   async reserve(classId: number) {

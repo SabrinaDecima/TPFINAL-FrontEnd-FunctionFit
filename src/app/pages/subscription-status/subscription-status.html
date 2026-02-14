@@ -1,0 +1,46 @@
+<div class="max-w-md mx-auto mt-10">
+  <div class="glass-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-900/50 shadow-xl">
+    
+    <div [ngClass]="subscription()?.isSubscriptionActive ? 'bg-green-600/20' : 'bg-red-600/20'" class="p-6 text-center border-b border-slate-700">
+      <div [ngClass]="subscription()?.isSubscriptionActive ? 'text-green-400' : 'text-red-400'" class="text-sm uppercase tracking-widest font-bold mb-2">
+        {{ subscription()?.isSubscriptionActive ? 'Suscripción Activa' : 'Suscripción Vencida' }}
+      </div>
+      <h2 class="text-3xl font-black text-white">
+        {{ subscription()?.planName || 'Sin Plan' }}
+      </h2>
+    </div>
+
+    <div class="p-8 space-y-6">
+      <div class="flex justify-between items-center">
+        <span class="text-slate-400">Vence el:</span>
+        <span class="text-white font-mono">
+          {{ subscription()?.subscriptionEndDate | date:'dd MMMM, yyyy' }}
+        </span>
+      </div>
+
+      <div class="space-y-2">
+        <div class="flex justify-between text-sm">
+          <span class="text-slate-400">Clases utilizadas</span>
+          <span class="text-white">
+            {{ subscription()?.enrolledClassesCount }} / {{ subscription()?.classLimit }}
+          </span>
+        </div>
+        <div class="w-full bg-slate-800 rounded-full h-2">
+          <div class="bg-blue-500 h-2 rounded-full transition-all duration-500" 
+               [style.width.%]="((subscription()?.enrolledClassesCount || 0) / (subscription()?.classLimit || 1)) * 100">
+          </div>
+        </div>
+      </div>
+
+      <button *ngIf="!subscription()?.isSubscriptionActive" 
+              (click)="goToPayments()"
+              class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-blue-900/20">
+        Renovar Ahora
+      </button>
+
+      <div *ngIf="subscription()?.isSubscriptionActive" class="text-center text-xs text-slate-500 italic">
+        Tu suscripción está al día. ¡Disfruta de tus clases!
+      </div>
+    </div>
+  </div>
+</div>

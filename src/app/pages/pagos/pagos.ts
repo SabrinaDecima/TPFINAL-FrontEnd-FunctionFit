@@ -1,182 +1,119 @@
-import { Component, inject, signal } from '@angular/core';
-import { ServicesService } from '../../services/services.service';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { Payment } from '../../shared/interfaces';
+import { ActivatedRoute, Router } from '@angular/router'; // Importar Router
+import { PlanService } from '../../services/plan.service';
+import { PaymentService } from '../../services/payment.service';
+import { AuthService } from '../../services/auth.service';
+import { PlanResponse, TypePlan } from '../../shared/interfaces';
 
 @Component({
   selector: 'app-pagos',
-  templateUrl: './pagos.html',
-  styles: [],
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule],
+  templateUrl: './pagos.html'
 })
-export default class Pagos {
-
-  private servicesService = inject(ServicesService);
+export default class PagosComponent implements OnInit {
+  private planService = inject(PlanService);
+  private paymentService = inject(PaymentService);
+  private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  // Estado
-  currentPayment = signal<Payment | null>(null);
-  paymentHistory = signal<Payment[]>([]);
-  loading = signal<boolean>(true);
-  checkingPayment = signal<boolean>(false);
+  plans = signal<PlanResponse[]>([]);
+  loading = signal(false);
+  typePlan = TypePlan;
+  subscription = signal<any>(null);
 
-  constructor() {
-    this.loadPayments();
-    this.checkForMercadoPagoReturn();
+  esperandoConfirmacion = signal(false);
+
+  ngOnInit() {
+    this.loadPlans();
+    this.checkPaymentStatus();
+    this.checkCurrentSubscription();
   }
 
-  async loadPayments() {
-    this.loading.set(true);
-
+  checkCurrentSubscription() {
     try {
-      const history = await this.servicesService.getPaymentHistory();
-      const mapped = history.map(p => this.mapToPayment(p));
-
-      // Pago pendiente más reciente
-      const pending = mapped
-        .filter(p => !p.Pagado)
-        .sort((a, b) => new Date(b.Fecha).getTime() - new Date(a.Fecha).getTime())[0];
-
-      this.currentPayment.set(pending ?? null);
-
-      // Historial sin el pago actual
-      this.paymentHistory.set(mapped.filter(p => p !== pending));
-
-    } catch (err) {
-      console.error('Error al cargar pagos:', err);
-      this.currentPayment.set(null);
-      this.paymentHistory.set([]);
-    } finally {
-      this.loading.set(false);
-    }
-  }
-
-
-
-  // Mapper seguro
- mapToPayment(p: any): Payment {
-  return {
-    Id: p.Id ?? p.id,
-    UserId: p.UserId ?? p.userId,
-    Monto: p.Monto ?? p.monto,
-    Fecha: p.Fecha ?? p.fecha,
-    Pagado: p.Pagado ?? p.pagado,
-    InitPoint: p.InitPoint ?? p.initPoint
-  };
-}
-
-  async pay() {
-    const payment = this.currentPayment();
-    if (!payment) return;
-
-    try {
-      const user = this.servicesService.getCurrentUser();
-      const res = await this.servicesService.createMercadoPagoPayment({
-        Monto: payment.Monto,
-        Email: user?.email
-      });
-
-      if (!res || !res.initPoint) {
-        alert('Error al iniciar pago');
+      const userId = this.authService.getUserId();
+      
+      // Si no hay ID válido, no hacemos la llamada HTTP
+      if (userId === 0) {
+        this.subscription.set(null);
         return;
       }
-
-      // Guardar el preferenceId o algo para verificar después si falla el redirect
-      localStorage.setItem('last_payment_pref', res.preferenceId);
-
-      // Redirigir a Mercado Pago en una nueva pestaña
-      window.open(res.initPoint, '_blank');
-
-    } catch (err) {
-      console.error('Error al iniciar pago:', err);
-      alert('Error al iniciar pago. Revisa la consola.');
+      
+      this.paymentService.getActiveSubscription(userId).subscribe({
+        next: (sub) => {
+          console.log('Respuesta del servidor:', sub);
+          // Si la suscripción existe y está activa (o vence en el futuro)
+          if (sub && sub.isActive) {
+            this.subscription.set(sub);
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Error al obtener ID del usuario:', error);
+      this.subscription.set(null);
     }
   }
 
-  async verifyLastPayment() {
-    this.checkingPayment.set(true);
-    try {
-      // Llamamos al backend para que busque activamente el pago en MP
-      await this.servicesService.verifyPaymentStatus();
-      
-      // Recargamos la lista local
-      await this.loadPayments();
-      
-      const current = this.currentPayment();
-      if (current?.Pagado) {
-        alert('¡Pago verificado con éxito!');
-      } else {
-        alert('El pago aún figura como pendiente. Si ya pagaste, espera unos instantes y vuelve a intentar.');
-      }
-    } catch (err) {
-      console.error('Error verificando:', err);
-      alert('Error al verificar el pago.');
-    } finally {
-      this.checkingPayment.set(false);
-    }
+  loadPlans() {
+    this.planService.getAllPlans().subscribe(res => this.plans.set(res));
   }
 
-  private async checkForMercadoPagoReturn() {
-    const params = new URLSearchParams(window.location.search);
-    const paymentId = params.get('payment_id') || params.get('collection_id');
+  checkPaymentStatus() {
+    // Escuchamos los parámetros de la URL
+    this.route.queryParams.subscribe(params => {
+      const paymentId = params['payment_id'];
+      const status = params['status'];
 
-    console.log('Verificando retorno de MP. URL completa:', window.location.href);
-    console.log('Payment ID encontrado:', paymentId);
-
-    if (paymentId) {
-      this.checkingPayment.set(true);
-      
-      try {
-        console.log('Notificando pago al backend:', paymentId);
-        // Notificar al backend sobre el pago
-        await this.servicesService.notifyMercadoPago(paymentId);
-        console.log('Pago notificado exitosamente');
-        
-        // Limpiar URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-        
-        // Recargar pagos
-        await this.loadPayments();
-      } catch (err) {
-        console.error('Error verificando pago:', err);
-      } finally {
-        this.checkingPayment.set(false);
+      // Si el pago fue aprobado y tenemos el ID, confirmamos con el backend
+      if (status === 'approved' && paymentId) {
+        this.confirmarPagoEnServidor(paymentId);
+      } else if (status === 'failure') {
+        alert('El pago fue rechazado. Por favor, intenta nuevamente.');
       }
-    }
+    });
   }
 
-  // Formateo de fecha
-  formatDate(fecha?: string) {
-    if (!fecha) return '';
+  confirmarPagoEnServidor(paymentId: string) {
+   
+    if (!paymentId) return alert('Por favor, ingresa el número de operación');
 
-    let date = new Date(fecha);
-
-    if (isNaN(date.getTime())) {
-      const [datePart, timePart] = fecha.split(' ');
-      const [d, m, y] = (datePart || '').split('-');
-      if (y && m && d) {
-        date = new Date(`${y}-${m}-${d}${timePart ? 'T' + timePart : ''}`);
+    this.loading.set(true);
+    this.paymentService.confirmarPago(paymentId).subscribe({
+      next: (res) => {
+        this.loading.set(false);
+        this.esperandoConfirmacion.set(false); // Ocultamos el cuadro
+        this.checkCurrentSubscription(); // Refrescar el estado de la suscripción
+        alert('¡Pago confirmado exitosamente!');
+        this.router.navigate(['/home-socio']);
+      },
+      error: (err) => {
+        this.loading.set(false);
+        alert('No se pudo validar el pago. Verifica el número e intenta de nuevo.');
       }
-    }
+    });
+  }
 
-    if (isNaN(date.getTime())) return '';
+  buyPlan(planId: number) {
+    this.loading.set(true);
+    this.paymentService.createPreference(planId).subscribe({
+      next: (res) => {
+        this.loading.set(false);
+        window.open(res.initPoint, '_blank');
+        this.esperandoConfirmacion.set(true); 
+      },
+      error: () => this.loading.set(false)
+    });
+  }
 
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const hours = pad(date.getHours());
-    const minutes = pad(date.getMinutes());
-    const day = pad(date.getDate());
-    const year = date.getFullYear();
-
-    const meses = [
-      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
-    ];
-
-    const monthName = meses[date.getMonth()];
-
-    return `${hours}:${minutes} ${day} de ${monthName} de ${year}`;
+  getPlanDetails(tipo: TypePlan) {
+    const details = {
+      [TypePlan.Basic]: { icon: '🚀', desc: '5 clases mensuales' },
+      [TypePlan.Premium]: { icon: '⭐', desc: '10 clases mensuales' },
+      [TypePlan.Elite]: { icon: '👑', desc: 'Clases ilimitadas' }
+    };
+    return details[tipo];
   }
 }

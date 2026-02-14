@@ -76,6 +76,11 @@ export const routes: Routes = [
                 canActivate: [roleGuard('SuperAdministrador')]
             },
             {
+                path: 'mi-suscripcion',
+                loadComponent: () => import('./pages/subscription-status/subscription-status'),
+                canActivate: [roleGuard('Socio')]
+            },
+            {
                 path: 'clases',
                 loadComponent: () => import('./pages/clases/clases'),
                 canActivate: [roleGuard('Socio')]

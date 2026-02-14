@@ -2,7 +2,7 @@ import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { firstValueFrom } from 'rxjs';
-import { User } from '../shared/interfaces';
+import { User, UserProfileResponse } from '../shared/interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -27,6 +27,21 @@ export class UserService {
     } catch (error) {
       console.error('Error al cargar usuarios:', error);
       return [];
+    }
+  }
+
+    async getMe(): Promise<UserProfileResponse> {
+    try {
+      const token = localStorage.getItem('authToken');
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+      // Ahora el HttpClient sabe exactamente qué forma tiene la respuesta
+      return await firstValueFrom(
+        this.http.get<UserProfileResponse>(`${this.API_URL}/User/me`, { headers })
+      );
+    } catch (error) {
+      console.error('Error al obtener el perfil:', error);
+      throw error;
     }
   }
 }
